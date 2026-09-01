@@ -9,7 +9,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -18,7 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-public class Clienti {
+public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -64,9 +63,9 @@ public class Clienti {
     @Setter(AccessLevel.NONE)
     private LocalDateTime dataUltimaModifica;
 
-   public Clienti(){}
+   public Cliente(){}
 
-    public Clienti(String ragioneSociale, String partitaIva, String email, BigDecimal fatturatoAnnuale,
+    public Cliente(String ragioneSociale, String partitaIva, String email, BigDecimal fatturatoAnnuale,
                    TipoSocietario tipo, String logoAziendale, Indirizzo sedeLegale, Indirizzo sedeOperativa){
        this.ragioneSociale = ragioneSociale;
        this.partitaIva = partitaIva;
