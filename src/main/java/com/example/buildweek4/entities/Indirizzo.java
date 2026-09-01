@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -12,7 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 
-public class Indirizzi {
+public class Indirizzo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
@@ -33,16 +34,19 @@ public class Indirizzi {
     private LocalDateTime data_ultima_modifica;
 
 
-    public Indirizzi(){}
+    public Indirizzo(){}
 
-    @OneToMany
-    @JoinColumn(name = "sede_legale_id", nullable = false)
-    private Clienti sede_legale;
-    @OneToMany
-    @JoinColumn(name = "sede_operativa_id", nullable = false)
-    private Clienti sede_operativa;
+    // lato inverso delle relazioni: le colonne sede_legale_id e sede_operativa_id
+    // vivono sulla tabella clienti, mappate dai campi sedeLegale e sedeOperativa di Cliente.
+    // @ToString.Exclude evita di caricare l'intera lista quando si stampa l'indirizzo
+    @OneToMany(mappedBy = "sedeLegale")
+    @ToString.Exclude
+    private List<Cliente> clientiSedeLegale;
+    @OneToMany(mappedBy = "sedeOperativa")
+    @ToString.Exclude
+    private List<Cliente> clientiSedeOperativa;
 
-    public Indirizzi(String via, String civico, String citta, String provincia, String cap, Clienti sede_legale, Clienti sede_operativa) {
+    public Indirizzo(String via, String civico, String citta, String provincia, String cap) {
         this.via = via;
         this.civico = civico;
         this.citta = citta;
@@ -50,4 +54,3 @@ public class Indirizzi {
         this.cap = cap;
     }
 }
-
