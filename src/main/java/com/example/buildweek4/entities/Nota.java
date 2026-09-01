@@ -34,10 +34,11 @@ public class Nota {
     @Setter(AccessLevel.NONE)
     private Utente autore;
 
-    @Column(name = "creata_il", updatable = false)
+    // da valorizzare nel service: dataCreazione al salvataggio, dataModifica a ogni update
+    @Column(name = "creato_il", updatable = false)
     private LocalDateTime dataCreazione;
 
-    @Column(name = "modificata_il")
+    @Column(name = "modificato_il")
     private LocalDateTime dataModifica;
 
     public Nota() {}
