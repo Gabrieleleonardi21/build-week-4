@@ -13,7 +13,7 @@ import java.util.UUID;
 @ToString
 @Getter
 @Setter
-public class Fatture {
+public class Fattura {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
@@ -24,25 +24,23 @@ public class Fatture {
     private BigDecimal importo;
     @Column(nullable = false, unique = true)
     private String numero;
-    @Column(nullable = false)
-    private UUID cliente_id;
-    @Column(nullable = false)
-    private UUID stato_id;
     @Column(nullable = false, updatable = false)
     private LocalDateTime data_creazione;
     @Column(nullable = false)
     private LocalDateTime data_ultima_modifica;
 
-    public Fatture(){}
+    public Fattura(){}
 
+    // le chiavi esterne sono gestite dalle relazioni: i campi cliente_id e stato_id
+    // sono stati rimossi perche' mappavano le stesse colonne dei @JoinColumn qui sotto
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
     @ManyToOne
     @JoinColumn(name = "stato_id", nullable = false)
-    private Stati_fattura stato;
+    private StatoFattura stato;
 
-    public Fatture(LocalDate data, BigDecimal importo, String numero, Cliente cliente, Stati_fattura stato) {
+    public Fattura(LocalDate data, BigDecimal importo, String numero, Cliente cliente, StatoFattura stato) {
         this.data = data;
         this.importo = importo;
         this.numero = numero;
