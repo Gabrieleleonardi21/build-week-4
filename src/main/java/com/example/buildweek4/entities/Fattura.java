@@ -24,10 +24,11 @@ public class Fattura {
     private BigDecimal importo;
     @Column(nullable = false, unique = true)
     private String numero;
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime data_creazione;
-    @Column(nullable = false)
-    private LocalDateTime data_ultima_modifica;
+    // da valorizzare nel service: dataCreazione al salvataggio, dataModifica a ogni update
+    @Column(name = "creato_il", updatable = false)
+    private LocalDateTime dataCreazione;
+    @Column(name = "modificato_il")
+    private LocalDateTime dataModifica;
 
     public Fattura(){}
 

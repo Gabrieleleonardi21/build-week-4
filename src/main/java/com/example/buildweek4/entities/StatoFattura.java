@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -24,9 +23,12 @@ public class StatoFattura {
     @Column(unique = true)
     private String nome;
 
-    @CreationTimestamp
-    @Setter(AccessLevel.NONE)
-    private LocalDateTime dataUltimaModica;
+    // da valorizzare nel service: dataCreazione al salvataggio, dataModifica a ogni update
+    @Column(name = "creato_il", updatable = false)
+    private LocalDateTime dataCreazione;
+
+    @Column(name = "modificato_il")
+    private LocalDateTime dataModifica;
 
     public StatoFattura(){}
 
