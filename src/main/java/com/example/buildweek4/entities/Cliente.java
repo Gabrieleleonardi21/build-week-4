@@ -55,13 +55,12 @@ public class Cliente {
     @ToString.Exclude
     private  Indirizzo sedeOperativa;
 
-   @CreationTimestamp
-    @Setter(AccessLevel.NONE)
+   @Column(name = "creato_il", updatable = false)
     private LocalDateTime dataCreazione;
 
-   @UpdateTimestamp
-    @Setter(AccessLevel.NONE)
-    private LocalDateTime dataUltimaModifica;
+
+    @Column(name = "modificato_il")
+    private LocalDateTime dataModifica;
 
    public Cliente(){}
 
