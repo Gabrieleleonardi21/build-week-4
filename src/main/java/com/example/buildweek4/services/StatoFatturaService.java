@@ -1,0 +1,54 @@
+package com.example.buildweek4.services;
+
+import com.example.buildweek4.entities.StatoFattura;
+import com.example.buildweek4.payload.NewStatoFatturaDTO;
+import com.example.buildweek4.repositories.FatturaRepository;
+import com.example.buildweek4.repositories.StatoFatturaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class StatoFatturaService {
+
+    private final StatoFatturaRepository statoFatturaRepository;
+    private final FatturaRepository fatturaRepository;
+
+    public StatoFattura save(NewStatoFatturaDTO body) {
+        if (statoFatturaRepository.existsByNome(body.nome())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stato fattura esistente: " + body.nome());
+        }
+        StatoFattura stato = new StatoFattura(body.nome());
+        stato.setDataCreazione(LocalDateTime.now());
+        stato.setDataModifica(LocalDateTime.now());
+        return statoFatturaRepository.save(stato);
+    }
+
+    public List<StatoFattura> findAll() {
+        return statoFatturaRepository.findAll();
+    }
+
+    public StatoFattura update(UUID id, NewStatoFatturaDTO body) {
+        StatoFattura stato = statoFatturaRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Stato non trovato: " + id));
+        if(!stato.getNome().equals(body.nome()) && statoFatturaRepository.existsByNome(body.nome())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stato fattura esistente: " + body.nome());
+        }
+        stato.setNome(body.nome());
+        stato.setDataModifica(LocalDateTime.now());
+        return statoFatturaRepository.save(stato);
+    }
+
+    public void delete(UUID id) {
+        StatoFattura stato = statoFatturaRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Stato non trovato: " + id));
+        if(fatturaRepository.existsByStatoId(id)) {
+           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stato in uso, non eliminabile");
+        }
+        statoFatturaRepository.delete(stato);
+    }
+}
