@@ -1,4 +1,4 @@
-package com.example.buildweek4.payload;
+package com.example.buildweek4.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
