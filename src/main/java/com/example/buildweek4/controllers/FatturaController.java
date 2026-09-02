@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -35,6 +36,7 @@ public class FatturaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public Fattura create(@RequestBody @Valid NewFatturaDTO body) {
         return fatturaService.save(body);

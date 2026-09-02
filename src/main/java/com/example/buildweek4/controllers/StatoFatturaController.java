@@ -6,6 +6,7 @@ import com.example.buildweek4.services.StatoFatturaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,17 +29,20 @@ public class StatoFatturaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public StatoFattura create(@RequestBody @Valid NewStatoFatturaDTO body) {
         return statoFatturaService.save(body);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     public StatoFattura update(@PathVariable UUID id, @RequestBody @Valid NewStatoFatturaDTO body) {
         return statoFatturaService.update(id, body);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {
         statoFatturaService.delete(id);
