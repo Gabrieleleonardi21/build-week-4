@@ -50,6 +50,12 @@ public class Utente implements UserDetails {
     @Column(name = "modificato_il")
     private LocalDateTime dataModifica;
 
+    @PrePersist
+    private void onCreazione() {
+        this.dataCreazione = LocalDateTime.now();
+        this.dataModifica = LocalDateTime.now();
+    }
+
     public Utente() {}
 
     public Utente(String email, String password, String nome, String cognome, Ruolo ruolo) {
