@@ -2,7 +2,7 @@ package com.example.buildweek4.security;
 
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.exceptions.UnauthorizedException;
-import com.example.buildweek4.repository.UtenteRepository;
+import com.example.buildweek4.repositories.UtenteRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
