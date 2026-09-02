@@ -10,6 +10,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.example.buildweek4.exceptions.NotFoundException;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UtenteService implements UserDetailsService {
@@ -39,6 +43,28 @@ public class UtenteService implements UserDetailsService {
                 dto.cognome(),
                 Ruolo.USER
         );
+        return utenteRepository.save(utente);
+    }
+    public List<Utente> findAll() {
+        return utenteRepository.findAll();
+    }
+
+    public Utente findById(UUID id) {
+        return utenteRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Utente non trovato: " + id));
+    }
+
+    // Operazione riservata all'ADMIN (bloccata a monte dal @PreAuthorize sul controller)
+    public Utente cambiaRuolo(UUID id, String nuovoRuolo) {
+        Utente utente = this.findById(id);
+
+        try {
+            utente.setRuolo(Ruolo.valueOf(nuovoRuolo.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Ruolo non valido: " + nuovoRuolo
+                    + ". Valori ammessi: USER, COMMERCIALE, CONTABILE, ADMIN");
+        }
+
         return utenteRepository.save(utente);
     }
 }
