@@ -7,7 +7,7 @@ import com.example.buildweek4.entities.Indirizzo;
 import com.example.buildweek4.entities.Ruolo;
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.exceptions.NotFoundException;
-import com.example.buildweek4.payload.ModificaClienteDTO;
+import com.example.buildweek4.dto.ModificaClienteDTO;
 import com.example.buildweek4.repositories.ClienteRepository;
 import com.example.buildweek4.repositories.IndirizzoRepository;
 import org.springframework.data.domain.Page;
@@ -53,23 +53,24 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
-    public Cliente modificaCliente(UUID clienteCorrenteId, ModificaClienteDTO payload) {
+    public Cliente modificaCliente(UUID clienteCorrenteId, ModificaClienteDTO dto) {
         Cliente cliente = getById(clienteCorrenteId);
 
-        cliente.setRagioneSociale(payload.ragioneSociale());
-        cliente.setPartitaIva(payload.partitaIva());
-        cliente.setEmail(payload.email());
-        cliente.setFatturatoAnnuale(payload.fatturatoAnnuale());
-        cliente.setTipo(payload.tipo());
-        cliente.setLogoAziendale(payload.logoAziendale());
-        cliente.setSedeLegale(payload.sedeLegale());
-        cliente.setSedeOperativa(payload.sedeOperativa());
+        cliente.setRagioneSociale(dto.ragioneSociale());
+        cliente.setPartitaIva(dto.partitaIva());
+        cliente.setEmail(dto.email());
+        cliente.setFatturatoAnnuale(dto.fatturatoAnnuale());
+        cliente.setTipo(dto.tipo());
+        cliente.setLogoAziendale(dto.logoAziendale());
+        cliente.setSedeLegale(dto.sedeLegale());
+        cliente.setSedeOperativa(dto.sedeOperativa());
 
         return clienteRepository.save(cliente);
     }
 
-    public Cliente patch(UUID id, PatchClienteDTO dto) {
-        Cliente cliente = getById(id);
+    public Cliente patchCliente(UUID clienteCorrenteId, PatchClienteDTO dto) {
+        Cliente cliente = getById(clienteCorrenteId);
+
         if (dto.getRagioneSociale() != null) cliente.setRagioneSociale(dto.getRagioneSociale());
         if (dto.getPartitaIva() != null) cliente.setPartitaIva(dto.getPartitaIva());
         if (dto.getEmail() != null) cliente.setEmail(dto.getEmail());

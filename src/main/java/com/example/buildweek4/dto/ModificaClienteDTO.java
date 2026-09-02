@@ -1,4 +1,4 @@
-package com.example.buildweek4.payload;
+package com.example.buildweek4.dto;
 
 import com.example.buildweek4.entities.Indirizzo;
 import com.example.buildweek4.entities.TipoSocietario;

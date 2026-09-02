@@ -1,6 +1,6 @@
 package com.example.buildweek4.exceptions;
 
-import com.example.buildweek4.payload.ErrorsDTO;
+import com.example.buildweek4.dto.ErrorsDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
