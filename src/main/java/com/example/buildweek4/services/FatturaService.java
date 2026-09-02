@@ -1,13 +1,28 @@
 package com.example.buildweek4.services;
 
-import com.example.buildweek4.repositories.ClienteRepository;
+import com.example.buildweek4.entities.Fattura;
+import com.example.buildweek4.exceptions.NotFoundException;
 import com.example.buildweek4.repositories.FatturaRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class FatturaService {
+
     private final FatturaRepository fatturaRepository;
-    private final ClienteRepository clienteRepository;
+
+    public FatturaService(FatturaRepository fatturaRepository) {
+        this.fatturaRepository = fatturaRepository;
+    }
+
+    public Page<Fattura> getAll(Pageable pageable) {
+        return fatturaRepository.findAll(pageable);
+    }
+
+    public Fattura getById(UUID id) {
+        return fatturaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Fattura con id " + id + " non trovata"));
+    }
 }
