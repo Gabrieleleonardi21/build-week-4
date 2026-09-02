@@ -24,12 +24,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-    // esposto come bean perche' AuthController lo inietta per autenticare email + password al login
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
