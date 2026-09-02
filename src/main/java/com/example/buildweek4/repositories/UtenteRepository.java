@@ -1,4 +1,4 @@
-package com.example.buildweek4.repository;
+package com.example.buildweek4.repositories;
 
 import com.example.buildweek4.entities.Utente;
 import org.springframework.data.jpa.repository.JpaRepository;
