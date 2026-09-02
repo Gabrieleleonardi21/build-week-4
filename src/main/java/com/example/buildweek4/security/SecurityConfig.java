@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // attiva le annotazioni @PreAuthorize sui controller
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -24,7 +24,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(12);
     }
 
-    // esposto come bean perche' AuthController lo inietta per autenticare email + password al login
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
@@ -40,8 +39,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
-                // il JwtFilter va inserito NELLA catena di security, PRIMA del controllo di autorizzazione:
-                // senza questa riga girerebbe dopo, e anyRequest().authenticated() troverebbe sempre il context vuoto → 403
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

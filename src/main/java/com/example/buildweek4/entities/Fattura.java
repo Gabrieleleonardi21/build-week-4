@@ -30,6 +30,17 @@ public class Fattura {
     @Column(name = "modificato_il")
     private LocalDateTime dataModifica;
 
+    @PrePersist
+    private void onCreazione() {
+        this.dataCreazione = LocalDateTime.now();
+        this.dataModifica = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void onModifica() {
+        this.dataModifica = LocalDateTime.now();
+    }
+
     public Fattura(){}
 
     // le chiavi esterne sono gestite dalle relazioni: i campi cliente_id e stato_id

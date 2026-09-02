@@ -30,6 +30,17 @@ public class StatoFattura {
     @Column(name = "modificato_il")
     private LocalDateTime dataModifica;
 
+    @PrePersist
+    private void onCreazione() {
+        this.dataCreazione = LocalDateTime.now();
+        this.dataModifica = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void onModifica() {
+        this.dataModifica = LocalDateTime.now();
+    }
+
     public StatoFattura(){}
 
     public StatoFattura(String nome){this.nome = nome;}
