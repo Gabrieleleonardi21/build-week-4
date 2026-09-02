@@ -7,5 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UtenteRepository extends JpaRepository<Utente, UUID> {
+    // usata da UtenteService.loadUserByUsername (login) e dal controllo email duplicata in registrazione
     Optional<Utente> findByEmail(String email);
 }
