@@ -4,8 +4,11 @@ import com.example.buildweek4.dto.NewFatturaDTO;
 import com.example.buildweek4.dto.UpdateFatturaDTO;
 import com.example.buildweek4.entities.Cliente;
 import com.example.buildweek4.entities.Fattura;
+import com.example.buildweek4.entities.Ruolo;
 import com.example.buildweek4.entities.StatoFattura;
+import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.exceptions.BadRequestException;
+import com.example.buildweek4.exceptions.ForbiddenException;
 import com.example.buildweek4.exceptions.NotFoundException;
 import com.example.buildweek4.repositories.ClienteRepository;
 import com.example.buildweek4.repositories.FatturaRepository;
@@ -65,14 +68,18 @@ public class FatturaService {
         return fatturaRepository.save(fattura);
     }
 
-    public Fattura cambiaStato(UUID fatturaId, String nuovoStatoNome) {
+    public Fattura cambiaStato(UUID fatturaId, String nuovoStatoNome, Utente currentUser) {
         Fattura fattura = this.getById(fatturaId);
         String statoAttuale = fattura.getStato().getNome();
         Set<String> statiAmmessi = TRANSIZIONI_VALIDE.getOrDefault(statoAttuale, Set.of());
         if (!statiAmmessi.contains(nuovoStatoNome)) {
             throw new BadRequestException("Transizione non valida da " + statoAttuale + " a " + nuovoStatoNome);
         }
-        // TODO: Gestione insoluta da parte di Admin
+        // il controllo sta qui e non in un @PreAuthorize perche' dipende dal contenuto
+        // del body: l'endpoint resta aperto ai contabili, e' solo questo stato a essere riservato
+        if (StatoFatturaService.INSOLUTA.equalsIgnoreCase(nuovoStatoNome) && currentUser.getRuolo() != Ruolo.ADMIN) {
+            throw new ForbiddenException("Solo un ADMIN puo' portare una fattura in stato " + StatoFatturaService.INSOLUTA);
+        }
         StatoFattura nuovoStato = statoFatturaRepository.findByNome(nuovoStatoNome)
                 .orElseThrow(() -> new NotFoundException("Stato non trovato: " + nuovoStatoNome));
         fattura.setStato(nuovoStato);
