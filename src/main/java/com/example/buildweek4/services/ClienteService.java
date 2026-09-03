@@ -10,7 +10,7 @@ import com.example.buildweek4.dto.ModificaClienteDTO;
 import com.example.buildweek4.repositories.ClienteRepository;
 import com.example.buildweek4.repositories.FatturaRepository;
 import com.example.buildweek4.repositories.IndirizzoRepository;
-import com.example.buildweek4.repositories.NoteRepository;
+import com.example.buildweek4.repositories.NotaRepository;
 import com.example.buildweek4.repositories.UtenteRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,16 +25,16 @@ public class ClienteService {
     private final IndirizzoRepository indirizzoRepository;
     private final UtenteRepository utenteRepository;
     private final FatturaRepository fatturaRepository;
-    private final NoteRepository noteRepository;
+    private final NotaRepository notaRepository;
 
     public ClienteService(ClienteRepository clienteRepository, IndirizzoRepository indirizzoRepository,
                           UtenteRepository utenteRepository, FatturaRepository fatturaRepository,
-                          NoteRepository noteRepository) {
+                          NotaRepository notaRepository) {
         this.clienteRepository = clienteRepository;
         this.indirizzoRepository = indirizzoRepository;
         this.utenteRepository = utenteRepository;
         this.fatturaRepository = fatturaRepository;
-        this.noteRepository = noteRepository;
+        this.notaRepository = notaRepository;
     }
     public Cliente findById(UUID id) {
         return clienteRepository.findById(id)
@@ -166,7 +166,7 @@ public class ClienteService {
         if (fatturaRepository.existsByClienteId(id)) {
             throw new EntityInUseException("Cliente non eliminabile: ha fatture collegate");
         }
-        if (noteRepository.existsByClienteId(id)) {
+        if (notaRepository.existsByClienteId(id)) {
             throw new EntityInUseException("Cliente non eliminabile: ha note collegate");
         }
 
