@@ -1,13 +1,15 @@
 package com.example.buildweek4.services;
 
 
-import com.example.buildweek4.dto.ModificaIndirizzoDTO;
+import com.example.buildweek4.dto.NuovoIndirizzoDTO;
 import com.example.buildweek4.dto.PatchIndirizzoDTO;
 import com.example.buildweek4.entities.Indirizzo;
 import com.example.buildweek4.exceptions.NotFoundException;
 import com.example.buildweek4.repositories.IndirizzoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -19,11 +21,22 @@ public class IndirizzoService {
         this.indirizzoRepository = indirizzoRepository;
     }
 
-    public Indirizzo getById(UUID id) {
-        return indirizzoRepository.findById(id).orElseThrow(() -> new NotFoundException("Indirizzo con id " + id + " non trovato"));
+    public List<Indirizzo> getAll() {
+        return indirizzoRepository.findAll();
     }
 
-    public Indirizzo modificaIndirizzo(UUID indirizzoCorrenteId, ModificaIndirizzoDTO dto) {
+    public Indirizzo getById(UUID indirizzoId) {
+        return indirizzoRepository.findById(indirizzoId).orElseThrow(() -> new NotFoundException("Indirizzo con id " + indirizzoId + " non trovato"));
+    }
+
+    public Indirizzo save(NuovoIndirizzoDTO dto) {
+        Indirizzo indirizzo = new Indirizzo(dto.via(), dto.civico(), dto.citta(), dto.provincia(), dto.cap());
+        indirizzo.setDataCreazione(LocalDateTime.now());
+        indirizzo.setDataModifica(LocalDateTime.now());
+        return indirizzoRepository.save(indirizzo);
+    }
+
+    public Indirizzo modificaIndirizzo(UUID indirizzoCorrenteId, NuovoIndirizzoDTO dto) {
         Indirizzo indirizzo = getById(indirizzoCorrenteId);
 
         indirizzo.setVia(dto.via());
@@ -31,6 +44,7 @@ public class IndirizzoService {
         indirizzo.setCitta(dto.citta());
         indirizzo.setProvincia(dto.provincia());
         indirizzo.setCap(dto.cap());
+        indirizzo.setDataModifica(LocalDateTime.now());
 
         return indirizzoRepository.save(indirizzo);
     }
@@ -43,6 +57,7 @@ public class IndirizzoService {
         if (dto.citta() != null) indirizzo.setCitta(dto.citta());
         if (dto.provincia() != null) indirizzo.setProvincia(dto.provincia());
         if (dto.cap() != null) indirizzo.setCap(dto.cap());
+        indirizzo.setDataModifica(LocalDateTime.now());
 
         return indirizzoRepository.save(indirizzo);
     }
