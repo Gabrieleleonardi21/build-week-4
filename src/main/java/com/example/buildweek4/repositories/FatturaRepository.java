@@ -19,4 +19,7 @@ public interface FatturaRepository extends JpaRepository<Fattura, UUID> {
     Page<Fattura> filtra(@Param("clienteId") UUID clienteId, @Param("statoId") UUID statoId, Pageable pageable);
 
     boolean existsByStatoId(UUID statoId);
+
+    // usata dal vincolo di cancellazione del cliente
+    boolean existsByClienteId(UUID clienteId);
 }

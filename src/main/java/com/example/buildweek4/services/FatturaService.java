@@ -137,4 +137,10 @@ public class FatturaService {
         fattura.setDataModifica(LocalDateTime.now());
         return fatturaRepository.save(fattura);
     }
+
+    // nessun vincolo da controllare: nessuna entita' referenzia la fattura
+    public void delete(UUID fatturaId) {
+        Fattura fattura = this.getById(fatturaId);
+        fatturaRepository.delete(fattura);
+    }
 }

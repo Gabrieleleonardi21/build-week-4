@@ -12,6 +12,15 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "note")
+// grafo usato da NoteRepository per caricare cliente e autore insieme alle note,
+// evitando una query aggiuntiva per ognuna delle due relazioni
+@NamedEntityGraph(
+        name = "Nota.conRelazioni",
+        attributeNodes = {
+                @NamedAttributeNode("cliente"),
+                @NamedAttributeNode("autore")
+        }
+)
 @Getter
 @Setter
 @ToString

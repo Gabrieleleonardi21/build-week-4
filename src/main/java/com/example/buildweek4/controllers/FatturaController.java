@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,22 +21,6 @@ import java.util.UUID;
 public class FatturaController {
     private final FatturaService fatturaService;
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Fattura create(@RequestBody @Valid NewFatturaDTO body) {
-        return fatturaService.save(body);
-    }
-
-    @PatchMapping("/{id}/stato")
-    public Fattura cambiaStato(@PathVariable UUID id, @RequestBody @Valid TransizioneStatoDTO body) {
-        return fatturaService.cambiaStato(id, body.nuovoStato());
-    }
-
-    @PutMapping("/{id}")
-    public Fattura update(@PathVariable UUID id, @RequestBody @Valid UpdateFatturaDTO body) {
-        return fatturaService.update(id, body);
-    }
-
     // unico endpoint di elenco: i filtri sono opzionali, quindi senza parametri
     // restituisce tutte le fatture paginate, con parametri le filtra
     @GetMapping
@@ -45,7 +28,6 @@ public class FatturaController {
                                     @RequestParam(required = false) UUID statoId,
                                     Pageable pageable) {
         return fatturaService.filtra(clienteId, statoId, pageable);
-    }
     }
 
     @GetMapping("/{id}")
@@ -61,12 +43,22 @@ public class FatturaController {
     }
 
     @PatchMapping("/{id}/stato")
+    @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     public Fattura cambiaStato(@PathVariable UUID id, @RequestBody @Valid TransizioneStatoDTO body) {
         return fatturaService.cambiaStato(id, body.nuovoStato());
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     public Fattura update(@PathVariable UUID id, @RequestBody @Valid UpdateFatturaDTO body) {
         return fatturaService.update(id, body);
     }
 
+    // la cancellazione e' l'unica operazione sulle fatture riservata al solo ADMIN
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable UUID id) {
+        fatturaService.delete(id);
+    }
+}

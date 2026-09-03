@@ -4,10 +4,13 @@ import com.example.buildweek4.dto.NuovoClienteDTO;
 import com.example.buildweek4.dto.PatchClienteDTO;
 import com.example.buildweek4.entities.*;
 import com.example.buildweek4.exceptions.BadRequestException;
+import com.example.buildweek4.exceptions.EntityInUseException;
 import com.example.buildweek4.exceptions.NotFoundException;
 import com.example.buildweek4.dto.ModificaClienteDTO;
 import com.example.buildweek4.repositories.ClienteRepository;
+import com.example.buildweek4.repositories.FatturaRepository;
 import com.example.buildweek4.repositories.IndirizzoRepository;
+import com.example.buildweek4.repositories.NoteRepository;
 import com.example.buildweek4.repositories.UtenteRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,12 +24,17 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
     private final IndirizzoRepository indirizzoRepository;
     private final UtenteRepository utenteRepository;
+    private final FatturaRepository fatturaRepository;
+    private final NoteRepository noteRepository;
 
     public ClienteService(ClienteRepository clienteRepository, IndirizzoRepository indirizzoRepository,
-                          UtenteRepository utenteRepository) {
+                          UtenteRepository utenteRepository, FatturaRepository fatturaRepository,
+                          NoteRepository noteRepository) {
         this.clienteRepository = clienteRepository;
         this.indirizzoRepository = indirizzoRepository;
         this.utenteRepository = utenteRepository;
+        this.fatturaRepository = fatturaRepository;
+        this.noteRepository = noteRepository;
     }
     public Cliente findById(UUID id) {
         return clienteRepository.findById(id)
@@ -92,14 +100,25 @@ public class ClienteService {
     public Cliente patchCliente(UUID clienteCorrenteId, PatchClienteDTO dto) {
         Cliente cliente = getById(clienteCorrenteId);
 
-        if (dto.getRagioneSociale() != null) cliente.setRagioneSociale(dto.getRagioneSociale());
-        if (dto.getPartitaIva() != null) cliente.setPartitaIva(dto.getPartitaIva());
-        if (dto.getEmail() != null) cliente.setEmail(dto.getEmail());
-        if (dto.getFatturatoAnnuale() != null) cliente.setFatturatoAnnuale(dto.getFatturatoAnnuale());
-        if (dto.getTipo() != null) cliente.setTipo(dto.getTipo());
-        if (dto.getLogoAziendale() != null) cliente.setLogoAziendale(dto.getLogoAziendale());
-        if (dto.getSedeLegaleId() != null) cliente.setSedeLegale(getIndirizzo(dto.getSedeLegaleId()));
-        if (dto.getSedeOperativaId() != null) cliente.setSedeOperativa(getIndirizzo(dto.getSedeOperativaId()));
+        // il controllo scatta solo se il valore cambia davvero: rimandare la stessa
+        // partita IVA del cliente che si sta modificando non deve dare errore
+        if (dto.partitaIva() != null && !dto.partitaIva().equals(cliente.getPartitaIva())
+                && clienteRepository.existsByPartitaIva(dto.partitaIva())) {
+            throw new BadRequestException("Partita IVA " + dto.partitaIva() + " gia' in uso");
+        }
+        if (dto.email() != null && !dto.email().equals(cliente.getEmail())
+                && clienteRepository.existsByEmail(dto.email())) {
+            throw new BadRequestException("Email " + dto.email() + " gia' in uso");
+        }
+
+        if (dto.ragioneSociale() != null) cliente.setRagioneSociale(dto.ragioneSociale());
+        if (dto.partitaIva() != null) cliente.setPartitaIva(dto.partitaIva());
+        if (dto.email() != null) cliente.setEmail(dto.email());
+        if (dto.fatturatoAnnuale() != null) cliente.setFatturatoAnnuale(dto.fatturatoAnnuale());
+        if (dto.tipo() != null) cliente.setTipo(dto.tipo());
+        if (dto.logoAziendale() != null) cliente.setLogoAziendale(dto.logoAziendale());
+        if (dto.sedeLegaleId() != null) cliente.setSedeLegale(getIndirizzo(dto.sedeLegaleId()));
+        if (dto.sedeOperativaId() != null) cliente.setSedeOperativa(getIndirizzo(dto.sedeOperativaId()));
         return clienteRepository.save(cliente);
     }
 
@@ -140,4 +159,17 @@ public class ClienteService {
         }
     }
 
+    public void delete(UUID id) {
+        Cliente cliente = this.findById(id);
+
+        // non eliminabile se ha Fatture o Note collegate
+        if (fatturaRepository.existsByClienteId(id)) {
+            throw new EntityInUseException("Cliente non eliminabile: ha fatture collegate");
+        }
+        if (noteRepository.existsByClienteId(id)) {
+            throw new EntityInUseException("Cliente non eliminabile: ha note collegate");
+        }
+
+        clienteRepository.delete(cliente);
+    }
 }
