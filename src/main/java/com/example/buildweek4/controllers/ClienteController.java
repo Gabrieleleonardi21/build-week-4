@@ -82,7 +82,7 @@ public class ClienteController {
     }
     // DELETE /clienti/{id} -> solo ADMIN, con i vincoli controllati nel service
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {
         clienteService.delete(id);
