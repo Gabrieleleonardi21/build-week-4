@@ -8,7 +8,6 @@ import com.example.buildweek4.entities.Cliente;
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.dto.ModificaClienteDTO;
 import com.example.buildweek4.services.ClienteService;
-import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.data.domain.Page;
@@ -48,7 +47,7 @@ public class ClienteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Cliente save(@RequestBody @Valid NuovoClienteDTO dto,
+    public Cliente save(@RequestBody @Validated NuovoClienteDTO dto,
                         @AuthenticationPrincipal Utente currentUser) {
         return clienteService.save(dto, currentUser);
     }
@@ -63,21 +62,21 @@ public class ClienteController {
     //2. PATCH http://localhost:5432/api/clienti/{clienteId} —> {payload modifica campo singolo cliente}
     @PatchMapping("/{clienteId}")
     @PreAuthorize("hasAnyRole('COMMERCIALE', 'ADMIN')")
-    public Cliente patchCliente(@PathVariable UUID clienteId, @RequestBody @Valid PatchClienteDTO dto) {
+    public Cliente patchCliente(@PathVariable UUID clienteId, @RequestBody @Validated PatchClienteDTO dto) {
         return clienteService.patchCliente(clienteId, dto);
     }
 
     // PATCH /clienti/{id}/commerciale -> solo ADMIN: assegna il commerciale che segue il cliente
     @PatchMapping("/{id}/commerciale")
     @PreAuthorize("hasRole('ADMIN')")
-    public Cliente assegnaCommerciale(@PathVariable UUID id, @RequestBody @Valid AssegnaCommercialeDTO dto) {
+    public Cliente assegnaCommerciale(@PathVariable UUID id, @RequestBody @Validated AssegnaCommercialeDTO dto) {
         return clienteService.assegnaCommerciale(id, dto.commercialeId());
     }
 
     // PATCH /clienti/{id}/tipo -> solo ADMIN: cambia il tipo societario del cliente
     @PatchMapping("/{id}/tipo")
     @PreAuthorize("hasRole('ADMIN')")
-    public Cliente cambiaTipo(@PathVariable UUID id, @RequestBody @Valid CambioTipoDTO dto) {
+    public Cliente cambiaTipo(@PathVariable UUID id, @RequestBody @Validated CambioTipoDTO dto) {
         return clienteService.cambiaTipo(id, dto.tipo());
     }
     // DELETE /clienti/{id} -> solo ADMIN, con i vincoli controllati nel service

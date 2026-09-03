@@ -4,7 +4,7 @@ import com.example.buildweek4.dto.LoginRequestDTO;
 import com.example.buildweek4.dto.LoginResponseDTO;
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.security.JWTtools;
-import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginResponseDTO login(@RequestBody @Valid LoginRequestDTO dto) {
+    public LoginResponseDTO login(@RequestBody @Validated LoginRequestDTO dto) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.email(), dto.password())
         );
