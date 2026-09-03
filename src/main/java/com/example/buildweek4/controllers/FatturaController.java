@@ -52,5 +52,4 @@ public class FatturaController {
         return fatturaService.getById(id);
     }
 }
-    }
-}
+

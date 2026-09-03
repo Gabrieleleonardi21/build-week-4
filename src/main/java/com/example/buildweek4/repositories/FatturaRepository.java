@@ -2,8 +2,6 @@ package com.example.buildweek4.repositories;
 
 import com.example.buildweek4.entities.Fattura;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.example.buildweek4.entities.Fattura;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -19,5 +17,4 @@ public interface FatturaRepository extends JpaRepository<Fattura, UUID> {
     List<Fattura> filtra(@Param("clienteId") UUID clienteId, @Param("statoId") UUID statoId);
 
     boolean existsByStatoId(UUID statoId);
-}
 }

@@ -1,7 +1,6 @@
 package com.example.buildweek4.services;
 
 import com.example.buildweek4.entities.StatoFattura;
-import com.example.buildweek4.entities.StatoFattura;
 import com.example.buildweek4.exceptions.NotFoundException;
 import com.example.buildweek4.payload.NewStatoFatturaDTO;
 import com.example.buildweek4.repositories.FatturaRepository;
@@ -59,7 +58,5 @@ public class StatoFatturaService {
     public StatoFattura getById(UUID id) {
         return statoFatturaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("StatoFattura con id " + id + " non trovato"));
-    }
-}
     }
 }

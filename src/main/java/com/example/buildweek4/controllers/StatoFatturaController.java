@@ -1,7 +1,6 @@
 package com.example.buildweek4.controllers;
 
 import com.example.buildweek4.entities.StatoFattura;
-import com.example.buildweek4.entities.StatoFattura;
 import com.example.buildweek4.payload.NewStatoFatturaDTO;
 import com.example.buildweek4.services.StatoFatturaService;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +42,5 @@ public class StatoFatturaController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {
         statoFatturaService.delete(id);
-    }
-}
     }
 }

@@ -91,5 +91,3 @@ public class FatturaService {
                 .orElseThrow(() -> new NotFoundException("Fattura con id " + id + " non trovata"));
     }
 }
-    }
-}
