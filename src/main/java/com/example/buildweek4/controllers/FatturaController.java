@@ -59,7 +59,7 @@ public class FatturaController {
         return fatturaService.update(id, body);
     }
 
-    // la cancellazione e' l'unica operazione sulle fatture riservata al solo ADMIN
+    // la cancellazione è l'unica operazione sulle fatture riservata al solo ADMIN
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
