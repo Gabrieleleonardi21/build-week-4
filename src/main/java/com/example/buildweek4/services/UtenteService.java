@@ -1,9 +1,12 @@
 package com.example.buildweek4.services;
 
+import com.example.buildweek4.dto.LoginRequestDTO;
+import com.example.buildweek4.dto.LoginResponseDTO;
 import com.example.buildweek4.dto.RegisterRequestDTO;
 import com.example.buildweek4.entities.Ruolo;
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.exceptions.BadRequestException;
+import com.example.buildweek4.exceptions.UnauthorizedException;
 import com.example.buildweek4.repositories.UtenteRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -67,4 +70,6 @@ public class UtenteService implements UserDetailsService {
 
         return utenteRepository.save(utente);
     }
+
+
 }

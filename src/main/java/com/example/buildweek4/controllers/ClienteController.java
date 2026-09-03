@@ -63,7 +63,7 @@ public class ClienteController {
     //2. PATCH http://localhost:5432/api/clienti/{clienteId} —> {payload modifica campo singolo cliente}
     @PatchMapping("/{clienteId}")
     @PreAuthorize("hasAnyRole('COMMERCIALE', 'ADMIN')")
-    public Cliente patchCliente(@PathVariable UUID clienteId,@Validated @RequestBody PatchClienteDTO dto) {
+    public Cliente patchCliente(@PathVariable UUID clienteId, @RequestBody @Valid PatchClienteDTO dto) {
         return clienteService.patchCliente(clienteId, dto);
     }
 
