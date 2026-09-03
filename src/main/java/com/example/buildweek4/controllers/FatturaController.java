@@ -6,7 +6,7 @@ import com.example.buildweek4.dto.UpdateFatturaDTO;
 import com.example.buildweek4.entities.Fattura;
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.services.FatturaService;
-import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +40,7 @@ public class FatturaController {
     @PostMapping
     @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
-    public Fattura create(@RequestBody @Valid NewFatturaDTO body) {
+    public Fattura create(@RequestBody @Validated NewFatturaDTO body) {
         return fatturaService.save(body);
     }
 
@@ -48,14 +48,14 @@ public class FatturaController {
     // perche' dipende dallo stato richiesto nel body
     @PatchMapping("/{id}/stato")
     @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
-    public Fattura cambiaStato(@PathVariable UUID id, @RequestBody @Valid TransizioneStatoDTO body,
+    public Fattura cambiaStato(@PathVariable UUID id, @RequestBody @Validated TransizioneStatoDTO body,
                                @AuthenticationPrincipal Utente currentUser) {
         return fatturaService.cambiaStato(id, body.nuovoStato(), currentUser);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
-    public Fattura update(@PathVariable UUID id, @RequestBody @Valid UpdateFatturaDTO body) {
+    public Fattura update(@PathVariable UUID id, @RequestBody @Validated UpdateFatturaDTO body) {
         return fatturaService.update(id, body);
     }
 
