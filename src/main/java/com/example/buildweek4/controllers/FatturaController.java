@@ -43,12 +43,22 @@ public class FatturaController {
     }
 
     @PatchMapping("/{id}/stato")
+    @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     public Fattura cambiaStato(@PathVariable UUID id, @RequestBody @Valid TransizioneStatoDTO body) {
         return fatturaService.cambiaStato(id, body.nuovoStato());
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     public Fattura update(@PathVariable UUID id, @RequestBody @Valid UpdateFatturaDTO body) {
         return fatturaService.update(id, body);
+    }
+
+    // la cancellazione e' l'unica operazione sulle fatture riservata al solo ADMIN
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable UUID id) {
+        fatturaService.delete(id);
     }
 }
