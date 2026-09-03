@@ -5,6 +5,7 @@ import com.example.buildweek4.dto.PatchClienteDTO;
 import com.example.buildweek4.entities.*;
 import com.example.buildweek4.exceptions.BadRequestException;
 import com.example.buildweek4.exceptions.NotFoundException;
+import com.example.buildweek4.dto.ModificaClienteDTO;
 import com.example.buildweek4.repositories.ClienteRepository;
 import com.example.buildweek4.repositories.IndirizzoRepository;
 import com.example.buildweek4.repositories.UtenteRepository;
@@ -73,9 +74,24 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
+    public Cliente modificaCliente(UUID clienteCorrenteId, ModificaClienteDTO dto) {
+        Cliente cliente = getById(clienteCorrenteId);
 
-    public Cliente patch(UUID id, PatchClienteDTO dto) {
-        Cliente cliente = getById(id);
+        cliente.setRagioneSociale(dto.ragioneSociale());
+        cliente.setPartitaIva(dto.partitaIva());
+        cliente.setEmail(dto.email());
+        cliente.setFatturatoAnnuale(dto.fatturatoAnnuale());
+        cliente.setTipo(dto.tipo());
+        cliente.setLogoAziendale(dto.logoAziendale());
+        cliente.setSedeLegale(dto.sedeLegale());
+        cliente.setSedeOperativa(dto.sedeOperativa());
+
+        return clienteRepository.save(cliente);
+    }
+
+    public Cliente patchCliente(UUID clienteCorrenteId, PatchClienteDTO dto) {
+        Cliente cliente = getById(clienteCorrenteId);
+
         if (dto.getRagioneSociale() != null) cliente.setRagioneSociale(dto.getRagioneSociale());
         if (dto.getPartitaIva() != null) cliente.setPartitaIva(dto.getPartitaIva());
         if (dto.getEmail() != null) cliente.setEmail(dto.getEmail());
