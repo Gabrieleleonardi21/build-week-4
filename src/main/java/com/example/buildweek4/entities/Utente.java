@@ -66,8 +66,6 @@ public class Utente implements UserDetails {
         this.ruolo = ruolo;
     }
 
-    // unico punto in cui si costruiscono le authority dell'utente:
-    // il prefisso "ROLE_" e' obbligatorio perche' hasRole('ADMIN') cerca l'authority "ROLE_ADMIN"
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.ruolo.name()));
