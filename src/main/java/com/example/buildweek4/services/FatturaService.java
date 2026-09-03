@@ -4,8 +4,11 @@ import com.example.buildweek4.dto.NewFatturaDTO;
 import com.example.buildweek4.dto.UpdateFatturaDTO;
 import com.example.buildweek4.entities.Cliente;
 import com.example.buildweek4.entities.Fattura;
+import com.example.buildweek4.entities.Ruolo;
 import com.example.buildweek4.entities.StatoFattura;
+import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.exceptions.BadRequestException;
+import com.example.buildweek4.exceptions.ForbiddenException;
 import com.example.buildweek4.exceptions.NotFoundException;
 import com.example.buildweek4.repositories.ClienteRepository;
 import com.example.buildweek4.repositories.FatturaRepository;
@@ -65,16 +68,25 @@ public class FatturaService {
         return fatturaRepository.save(fattura);
     }
 
-    public Fattura cambiaStato(UUID fatturaId, String nuovoStatoNome) {
+    public Fattura cambiaStato(UUID fatturaId, String nuovoStatoNome, Utente currentUser) {
         Fattura fattura = this.getById(fatturaId);
         String statoAttuale = fattura.getStato().getNome();
+        // normalizzato prima di ogni controllo: gli stati sono salvati in maiuscolo
+        // (vedi DataSeeder/ClientiFattureSeeder), senza questo un client che manda
+        // "emessa" in minuscolo si vedrebbe rifiutare una transizione legittima
+        String statoRichiesto = nuovoStatoNome.toUpperCase();
         Set<String> statiAmmessi = TRANSIZIONI_VALIDE.getOrDefault(statoAttuale, Set.of());
-        if (!statiAmmessi.contains(nuovoStatoNome)) {
-            throw new BadRequestException("Transizione non valida da " + statoAttuale + " a " + nuovoStatoNome);
+        if (!statiAmmessi.contains(statoRichiesto)) {
+            throw new BadRequestException("Transizione non valida da " + statoAttuale + " a " + statoRichiesto
+                    + ". Consentite da " + statoAttuale + ": " + statiAmmessi);
         }
-        // TODO: Gestione insoluta da parte di Admin
-        StatoFattura nuovoStato = statoFatturaRepository.findByNome(nuovoStatoNome)
-                .orElseThrow(() -> new NotFoundException("Stato non trovato: " + nuovoStatoNome));
+        // il controllo sta qui e non in un @PreAuthorize perche' dipende dal contenuto
+        // del body: l'endpoint resta aperto ai contabili, e' solo questo stato a essere riservato
+        if (StatoFatturaService.INSOLUTA.equals(statoRichiesto) && currentUser.getRuolo() != Ruolo.ADMIN) {
+            throw new ForbiddenException("Solo un ADMIN puo' portare una fattura in stato " + StatoFatturaService.INSOLUTA);
+        }
+        StatoFattura nuovoStato = statoFatturaRepository.findByNome(statoRichiesto)
+                .orElseThrow(() -> new NotFoundException("Stato non trovato: " + statoRichiesto));
         fattura.setStato(nuovoStato);
         fattura.setDataModifica(LocalDateTime.now());
         return fatturaRepository.save(fattura);

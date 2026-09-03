@@ -4,7 +4,7 @@ import com.example.buildweek4.dto.CambioRuoloDTO;
 import com.example.buildweek4.dto.RegisterRequestDTO;
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.services.UtenteService;
-import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class UtenteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Utente register(@RequestBody @Valid RegisterRequestDTO dto) {
+    public Utente register(@RequestBody @Validated RegisterRequestDTO dto) {
         return utenteService.register(dto);
     }
 
@@ -38,7 +38,7 @@ public class UtenteController {
     // PATCH /utenti/{id}/ruolo -> solo ADMIN: promuove un utente a COMMERCIALE, CONTABILE o ADMIN
     @PatchMapping("/{id}/ruolo")
     @PreAuthorize("hasRole('ADMIN')")
-    public Utente cambiaRuolo(@PathVariable UUID id, @RequestBody @Valid CambioRuoloDTO dto) {
+    public Utente cambiaRuolo(@PathVariable UUID id, @RequestBody @Validated CambioRuoloDTO dto) {
         return utenteService.cambiaRuolo(id, dto.ruolo());
     }
 }
