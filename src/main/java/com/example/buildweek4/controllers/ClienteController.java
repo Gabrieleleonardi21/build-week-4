@@ -80,4 +80,11 @@ public class ClienteController {
     public Cliente cambiaTipo(@PathVariable UUID id, @RequestBody @Valid CambioTipoDTO dto) {
         return clienteService.cambiaTipo(id, dto.tipo());
     }
+    // DELETE /clienti/{id} -> solo ADMIN, con i vincoli controllati nel service
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable UUID id) {
+        clienteService.delete(id);
+    }
 }

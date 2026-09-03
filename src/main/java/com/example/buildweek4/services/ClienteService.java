@@ -4,10 +4,13 @@ import com.example.buildweek4.dto.NuovoClienteDTO;
 import com.example.buildweek4.dto.PatchClienteDTO;
 import com.example.buildweek4.entities.*;
 import com.example.buildweek4.exceptions.BadRequestException;
+import com.example.buildweek4.exceptions.EntityInUseException;
 import com.example.buildweek4.exceptions.NotFoundException;
 import com.example.buildweek4.dto.ModificaClienteDTO;
 import com.example.buildweek4.repositories.ClienteRepository;
+import com.example.buildweek4.repositories.FatturaRepository;
 import com.example.buildweek4.repositories.IndirizzoRepository;
+import com.example.buildweek4.repositories.NoteRepository;
 import com.example.buildweek4.repositories.UtenteRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,12 +24,17 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
     private final IndirizzoRepository indirizzoRepository;
     private final UtenteRepository utenteRepository;
+    private final FatturaRepository fatturaRepository;
+    private final NoteRepository noteRepository;
 
     public ClienteService(ClienteRepository clienteRepository, IndirizzoRepository indirizzoRepository,
-                          UtenteRepository utenteRepository) {
+                          UtenteRepository utenteRepository, FatturaRepository fatturaRepository,
+                          NoteRepository noteRepository) {
         this.clienteRepository = clienteRepository;
         this.indirizzoRepository = indirizzoRepository;
         this.utenteRepository = utenteRepository;
+        this.fatturaRepository = fatturaRepository;
+        this.noteRepository = noteRepository;
     }
     public Cliente findById(UUID id) {
         return clienteRepository.findById(id)
@@ -140,4 +148,17 @@ public class ClienteService {
         }
     }
 
+    public void delete(UUID id) {
+        Cliente cliente = this.findById(id);
+
+        // non eliminabile se ha Fatture o Note collegate
+        if (fatturaRepository.existsByClienteId(id)) {
+            throw new EntityInUseException("Cliente non eliminabile: ha fatture collegate");
+        }
+        if (noteRepository.existsByClienteId(id)) {
+            throw new EntityInUseException("Cliente non eliminabile: ha note collegate");
+        }
+
+        clienteRepository.delete(cliente);
+    }
 }
