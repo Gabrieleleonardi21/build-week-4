@@ -14,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,7 +63,7 @@ public class ClienteController {
     //2. PATCH http://localhost:5432/api/clienti/{clienteId} —> {payload modifica campo singolo cliente}
     @PatchMapping("/{clienteId}")
     @PreAuthorize("hasAnyRole('COMMERCIALE', 'ADMIN')")
-    public Cliente patchCliente(@PathVariable UUID clienteId,@Validated @RequestBody PatchClienteDTO dto) {
+    public Cliente patchCliente(@PathVariable UUID clienteId, @RequestBody @Valid PatchClienteDTO dto) {
         return clienteService.patchCliente(clienteId, dto);
     }
 
@@ -80,5 +79,12 @@ public class ClienteController {
     @PreAuthorize("hasRole('ADMIN')")
     public Cliente cambiaTipo(@PathVariable UUID id, @RequestBody @Valid CambioTipoDTO dto) {
         return clienteService.cambiaTipo(id, dto.tipo());
+    }
+    // DELETE /clienti/{id} -> solo ADMIN, con i vincoli controllati nel service
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable UUID id) {
+        clienteService.delete(id);
     }
 }

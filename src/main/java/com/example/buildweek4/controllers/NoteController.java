@@ -1,6 +1,5 @@
 package com.example.buildweek4.controllers;
 
-import com.example.buildweek4.services.NotaService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +16,4 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/note")
 public class NoteController {
-
-    private final NotaService notaService;
 }
