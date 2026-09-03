@@ -4,9 +4,6 @@ import com.example.buildweek4.dto.NewFatturaDTO;
 import com.example.buildweek4.dto.TransizioneStatoDTO;
 import com.example.buildweek4.dto.UpdateFatturaDTO;
 import com.example.buildweek4.entities.Fattura;
-import com.example.buildweek4.payload.NewFatturaDTO;
-import com.example.buildweek4.payload.TransizioneStatoDTO;
-import com.example.buildweek4.payload.UpdateFatturaDTO;
 import com.example.buildweek4.services.FatturaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -72,5 +69,4 @@ public class FatturaController {
     public Fattura update(@PathVariable UUID id, @RequestBody @Valid UpdateFatturaDTO body) {
         return fatturaService.update(id, body);
     }
-}
 
