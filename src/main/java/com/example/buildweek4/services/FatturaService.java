@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -34,54 +33,6 @@ public class FatturaService {
             "EMESSA", Set.of("PAGATA", "SCADUTA"),
             "SCADUTA", Set.of("INSOLUTA")
     );
-    public Fattura save(NewFatturaDTO body) {
-        Fattura fattura = new Fattura();
-        fattura.setData(body.data());
-        fattura.setImporto(body.importo());
-        fattura.setNumero(body.numero());
-
-        Cliente cliente = clienteRepository.findById(body.clienteId())
-                .orElseThrow(() -> new NotFoundException("Cliente non trovato: " + body.clienteId()));
-        StatoFattura bozza = statoFatturaRepository.findByNome("BOZZA")
-                .orElseThrow(() -> new NotFoundException("Stato non trovato"));
-        fattura.setCliente(cliente);
-        fattura.setStato(bozza);
-        fattura.setDataCreazione(LocalDateTime.now());
-        fattura.setDataModifica(LocalDateTime.now());
-
-        return fatturaRepository.save(fattura);
-    }
-
-    public Fattura cambiaStato(UUID fatturaId, String nuovoStatoNome) {
-        Fattura fattura = fatturaRepository.findById(fatturaId)
-                .orElseThrow(() -> new NotFoundException("Fattura non trovata"));
-
-        String statoAttuale = fattura.getStato().getNome();
-        Set<String> statiAmmessi = TRANSIZIONI_VALIDE.getOrDefault(statoAttuale, Set.of());
-        if (!statiAmmessi.contains(nuovoStatoNome)) {
-            throw new BadRequestException("Transizione non valida da " + statoAttuale + " a " + nuovoStatoNome);
-        }
-
-        StatoFattura nuovoStato = statoFatturaRepository.findByNome(nuovoStatoNome)
-                .orElseThrow(() -> new NotFoundException("Stato non trovato: " + nuovoStatoNome));
-        fattura.setStato(nuovoStato);
-        fattura.setDataModifica(LocalDateTime.now());
-        return fatturaRepository.save(fattura);
-    }
-
-    public Fattura update(UUID fatturaId, UpdateFatturaDTO body) {
-        Fattura fattura = fatturaRepository.findById(fatturaId)
-                .orElseThrow(() -> new NotFoundException("Fattura non trovata"));
-        fattura.setData(body.data());
-        fattura.setImporto(body.importo());
-        fattura.setNumero(body.numero());
-        fattura.setDataModifica(LocalDateTime.now());
-        return fatturaRepository.save(fattura);
-    }
-
-    public Page<Fattura> filtra(UUID clienteId, UUID statoId, Pageable pageable) {
-        return fatturaRepository.filtra(clienteId, statoId, pageable);
-    }
 
     public Page<Fattura> getAll(Pageable pageable) {
         return fatturaRepository.findAll(pageable);

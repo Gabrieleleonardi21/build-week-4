@@ -2,7 +2,6 @@ package com.example.buildweek4.controllers;
 
 import com.example.buildweek4.dto.NewStatoFatturaDTO;
 import com.example.buildweek4.entities.StatoFattura;
-import com.example.buildweek4.payload.NewStatoFatturaDTO;
 import com.example.buildweek4.services.StatoFatturaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +38,6 @@ public class StatoFatturaController {
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     public StatoFattura update(@PathVariable UUID id, @RequestBody @Valid NewStatoFatturaDTO body) {
-        return statoFatturaService.update(id, body);
-    }
         return statoFatturaService.update(id, body);
     }
 

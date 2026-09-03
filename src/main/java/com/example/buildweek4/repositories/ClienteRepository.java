@@ -13,3 +13,4 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID> {
     boolean existsByPartitaIva(String partitaIva);
 
     boolean existsByEmail(String email);
+}
