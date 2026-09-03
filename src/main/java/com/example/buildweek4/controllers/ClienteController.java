@@ -6,16 +6,26 @@ import com.example.buildweek4.dto.NuovoClienteDTO;
 import com.example.buildweek4.dto.PatchClienteDTO;
 import com.example.buildweek4.entities.Cliente;
 import com.example.buildweek4.entities.Utente;
+import com.example.buildweek4.dto.ModificaClienteDTO;
 import com.example.buildweek4.services.ClienteService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+
+/*
+
+  **************** CLIENTI CRUD ****************
+- PUT http://localhost:5432/api/clienti/{clienteId} —> {payload modifiche complete cliente}
+- PATCH http://localhost:5432/api/clienti/{clienteId} —> {payload modifica campo singolo cliente}
+
+ */
 
 @RestController
 @RequestMapping("/api/clienti")
@@ -43,9 +53,18 @@ public class ClienteController {
         return clienteService.save(dto, currentUser);
     }
 
-    @PatchMapping("/{id}")
-    public Cliente patch(@PathVariable UUID id, @RequestBody PatchClienteDTO dto) {
-        return clienteService.patch(id, dto);
+    //1. PUT http://localhost:5432/api/clienti/{clienteId} —> {payload modifiche complete cliente}
+    @PutMapping("/{clienteId}")
+    @PreAuthorize("hasAnyRole('COMMERCIALE', 'ADMIN')")
+    public Cliente modificaCliente(@PathVariable UUID clienteId, @Validated @RequestBody ModificaClienteDTO dto) {
+        return clienteService.modificaCliente(clienteId, dto);
+    }
+
+    //2. PATCH http://localhost:5432/api/clienti/{clienteId} —> {payload modifica campo singolo cliente}
+    @PatchMapping("/{clienteId}")
+    @PreAuthorize("hasAnyRole('COMMERCIALE', 'ADMIN')")
+    public Cliente patchCliente(@PathVariable UUID clienteId,@Validated @RequestBody PatchClienteDTO dto) {
+        return clienteService.patchCliente(clienteId, dto);
     }
 
     // PATCH /clienti/{id}/commerciale -> solo ADMIN: assegna il commerciale che segue il cliente
