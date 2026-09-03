@@ -71,17 +71,22 @@ public class FatturaService {
     public Fattura cambiaStato(UUID fatturaId, String nuovoStatoNome, Utente currentUser) {
         Fattura fattura = this.getById(fatturaId);
         String statoAttuale = fattura.getStato().getNome();
+        // normalizzato prima di ogni controllo: gli stati sono salvati in maiuscolo
+        // (vedi DataSeeder/ClientiFattureSeeder), senza questo un client che manda
+        // "emessa" in minuscolo si vedrebbe rifiutare una transizione legittima
+        String statoRichiesto = nuovoStatoNome.toUpperCase();
         Set<String> statiAmmessi = TRANSIZIONI_VALIDE.getOrDefault(statoAttuale, Set.of());
-        if (!statiAmmessi.contains(nuovoStatoNome)) {
-            throw new BadRequestException("Transizione non valida da " + statoAttuale + " a " + nuovoStatoNome);
+        if (!statiAmmessi.contains(statoRichiesto)) {
+            throw new BadRequestException("Transizione non valida da " + statoAttuale + " a " + statoRichiesto
+                    + ". Consentite da " + statoAttuale + ": " + statiAmmessi);
         }
         // il controllo sta qui e non in un @PreAuthorize perche' dipende dal contenuto
         // del body: l'endpoint resta aperto ai contabili, e' solo questo stato a essere riservato
-        if (StatoFatturaService.INSOLUTA.equalsIgnoreCase(nuovoStatoNome) && currentUser.getRuolo() != Ruolo.ADMIN) {
+        if (StatoFatturaService.INSOLUTA.equals(statoRichiesto) && currentUser.getRuolo() != Ruolo.ADMIN) {
             throw new ForbiddenException("Solo un ADMIN puo' portare una fattura in stato " + StatoFatturaService.INSOLUTA);
         }
-        StatoFattura nuovoStato = statoFatturaRepository.findByNome(nuovoStatoNome)
-                .orElseThrow(() -> new NotFoundException("Stato non trovato: " + nuovoStatoNome));
+        StatoFattura nuovoStato = statoFatturaRepository.findByNome(statoRichiesto)
+                .orElseThrow(() -> new NotFoundException("Stato non trovato: " + statoRichiesto));
         fattura.setStato(nuovoStato);
         fattura.setDataModifica(LocalDateTime.now());
         return fatturaRepository.save(fattura);
