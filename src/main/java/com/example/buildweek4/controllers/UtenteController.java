@@ -2,6 +2,7 @@ package com.example.buildweek4.controllers;
 
 import com.example.buildweek4.dto.CambioRuoloDTO;
 import com.example.buildweek4.dto.RegisterRequestDTO;
+import com.example.buildweek4.dto.UtenteResponseDTO;
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.services.UtenteService;
 import org.springframework.validation.annotation.Validated;
@@ -25,29 +26,31 @@ public class UtenteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Utente register(@RequestBody @Validated RegisterRequestDTO dto) {
-        return utenteService.register(dto);
+    public UtenteResponseDTO register(@RequestBody @Validated RegisterRequestDTO dto) {
+        return UtenteResponseDTO.from(utenteService.register(dto));
     }
 
     // GET /utenti/me -> il proprio profilo: nessun @PreAuthorize, basta essere
     // autenticati. L'Utente arriva dal SecurityContext, dove lo ha messo il
     // JwtFilter partendo dall'id contenuto nel token (la password e' @JsonIgnore)
     @GetMapping("/me")
-    public Utente getProfilo(@AuthenticationPrincipal Utente currentUser) {
-        return currentUser;
+    public UtenteResponseDTO getProfilo(@AuthenticationPrincipal Utente currentUser) {
+        return UtenteResponseDTO.from(currentUser);
     }
 
     // GET /utenti -> solo ADMIN (gli serve per trovare gli id da promuovere)
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public List<Utente> findAll() {
-        return utenteService.findAll();
+    public List<UtenteResponseDTO> findAll() {
+        return utenteService.findAll().stream()
+                .map(UtenteResponseDTO::from)
+                .toList();
     }
 
     // PATCH /utenti/{id}/ruolo -> solo ADMIN: promuove un utente a COMMERCIALE, CONTABILE o ADMIN
     @PatchMapping("/{id}/ruolo")
     @PreAuthorize("hasRole('ADMIN')")
-    public Utente cambiaRuolo(@PathVariable UUID id, @RequestBody @Validated CambioRuoloDTO dto) {
-        return utenteService.cambiaRuolo(id, dto.ruolo());
+    public UtenteResponseDTO cambiaRuolo(@PathVariable UUID id, @RequestBody @Validated CambioRuoloDTO dto) {
+        return UtenteResponseDTO.from(utenteService.cambiaRuolo(id, dto.ruolo()));
     }
 }
