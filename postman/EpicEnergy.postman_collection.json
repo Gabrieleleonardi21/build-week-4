@@ -2360,8 +2360,8 @@
 	],
 	"variable": [
 		{ "key": "baseUrl", "value": "http://localhost:3001/api" },
-		{ "key": "adminEmail", "value": "admin@epicenergy.it" },
-		{ "key": "adminPassword", "value": "adminpassword" },
+		{ "key": "adminEmail", "value": "admin@buildweek4.it" },
+		{ "key": "adminPassword", "value": "admin1234" },
 		{ "key": "passwordDefault", "value": "Password123!" },
 		{ "key": "runId", "value": "" },
 		{ "key": "emailCommerciale", "value": "" },
