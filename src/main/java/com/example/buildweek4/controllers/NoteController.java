@@ -1,8 +1,8 @@
 package com.example.buildweek4.controllers;
 
+import com.example.buildweek4.dto.NotaResponseDTO;
 import com.example.buildweek4.dto.NuovaNotaDTO;
 import com.example.buildweek4.dto.PatchNotaDTO;
-import com.example.buildweek4.entities.Nota;
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.services.NotaService;
 import org.springframework.http.HttpStatus;
@@ -37,29 +37,31 @@ public class NoteController {
     @PreAuthorize("hasAnyRole('COMMERCIALE', 'ADMIN')")
     @ResponseStatus(HttpStatus.CREATED) // 201
     @PostMapping
-        public Nota creaNota(@Validated @RequestBody NuovaNotaDTO dto, @AuthenticationPrincipal Utente currentUser) {
-        return this.notaService.save(dto, currentUser);
+    public NotaResponseDTO creaNota(@Validated @RequestBody NuovaNotaDTO dto, @AuthenticationPrincipal Utente currentUser) {
+        return NotaResponseDTO.from(this.notaService.save(dto, currentUser));
     }
 
     // 2. GET http://localhost:5432/api/note
     @PreAuthorize("hasAnyRole('COMMERCIALE', 'ADMIN')")
     @GetMapping
-    public List<Nota> getNote(@RequestParam(required = false) UUID clienteId , @AuthenticationPrincipal Utente currentUser) {
-        return this.notaService.getNote(clienteId, currentUser);
+    public List<NotaResponseDTO> getNote(@RequestParam(required = false) UUID clienteId, @AuthenticationPrincipal Utente currentUser) {
+        return this.notaService.getNote(clienteId, currentUser).stream()
+                .map(NotaResponseDTO::from)
+                .toList();
     }
 
     // 3. GET http://localhost:5432/api/note/{notaId}
     @PreAuthorize("hasAnyRole('COMMERCIALE', 'ADMIN')")
     @GetMapping("/{notaId}")
-    public Nota getNotaById(@PathVariable UUID notaId, @AuthenticationPrincipal Utente currentUser) {
-        return this.notaService.getById(notaId, currentUser);
+    public NotaResponseDTO getNotaById(@PathVariable UUID notaId, @AuthenticationPrincipal Utente currentUser) {
+        return NotaResponseDTO.from(this.notaService.getById(notaId, currentUser));
     }
 
     // 4. PATCH http://localhost:5432/api/note/{notaId} —> {payload modifica nota, solo se propria o cliente assegnato da Admin}
     @PreAuthorize("hasAnyRole('COMMERCIALE', 'ADMIN')")
     @PatchMapping("/{notaId}")
-    public Nota patchNota(@PathVariable UUID notaId, @RequestBody PatchNotaDTO dto, @AuthenticationPrincipal Utente currentUser) {
-        return this.notaService.patch(notaId, dto, currentUser);
+    public NotaResponseDTO patchNota(@PathVariable UUID notaId, @RequestBody PatchNotaDTO dto, @AuthenticationPrincipal Utente currentUser) {
+        return NotaResponseDTO.from(this.notaService.patch(notaId, dto, currentUser));
     }
 
 }
