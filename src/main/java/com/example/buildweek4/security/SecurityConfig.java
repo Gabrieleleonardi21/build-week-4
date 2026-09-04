@@ -42,6 +42,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(HttpMethod.POST, "/api/utenti").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        // senza questa riga, il forward interno che il container fa verso /error dopo un
+                        // response.sendError(...) (es. per le nostre eccezioni @ResponseStatus) viene bloccato
+                        // da anyRequest().authenticated(), e il client riceve un 403 vuoto al posto del vero
+                        // status code (400/404/409/...)
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 // il JwtFilter va inserito NELLA catena di security, PRIMA del controllo di autorizzazione:
