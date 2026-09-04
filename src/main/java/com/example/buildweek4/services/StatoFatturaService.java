@@ -23,6 +23,15 @@ public class StatoFatturaService {
     // lo stato riservato all'ADMIN: usato anche da FatturaService per la transizione
     public static final String INSOLUTA = "INSOLUTA";
 
+    // I cinque stati previsti dal progetto. Sono un contratto del codice, non dati
+    // modificabili: DataSeeder li crea partendo da questa lista e FatturaService
+    // cerca "BOZZA" per nome alla creazione di ogni fattura. Rinominarne o
+    // cancellarne uno rompe l'applicazione per chiunque, quindi update e delete
+    // li rifiutano a prescindere dal ruolo (vedi vietaSeDiSistema).
+    // Restano invece liberi gli stati aggiuntivi creati a mano dagli utenti.
+    public static final List<String> STATI_DI_SISTEMA =
+            List.of("BOZZA", "EMESSA", "PAGATA", "SCADUTA", INSOLUTA);
+
     private final StatoFatturaRepository statoFatturaRepository;
     private final FatturaRepository fatturaRepository;
 
@@ -48,6 +57,10 @@ public class StatoFatturaService {
 
     public StatoFattura update(UUID id, NewStatoFatturaDTO body, Utente currentUser) {
         StatoFattura stato = this.getById(id);
+        // il nome attuale: uno dei cinque stati di sistema non si rinomina.
+        // Senza questo controllo bastava una PUT su BOZZA per impedire a tutti
+        // la creazione di nuove fatture
+        vietaSeDiSistema(stato.getNome());
         // controllati entrambi i nomi: senza il primo un contabile potrebbe rinominare
         // SCADUTA in INSOLUTA e portarci tutte le fatture collegate, senza il secondo
         // potrebbe svuotare INSOLUTA rinominandola in qualcos'altro
@@ -63,6 +76,7 @@ public class StatoFatturaService {
 
     public void delete(UUID id, Utente currentUser) {
         StatoFattura stato = this.getById(id);
+        vietaSeDiSistema(stato.getNome());
         vietaSeInsoluta(stato.getNome(), currentUser);
         // uno stato ancora referenziato da una fattura non si puo' cancellare:
         // lascerebbe la fattura con un riferimento rotto
@@ -75,6 +89,17 @@ public class StatoFatturaService {
     // il contabile gestisce liberamente gli stati, tranne INSOLUTA: quello resta
     // all'ADMIN, altrimenti il vincolo sulla transizione delle fatture si aggira
     // semplicemente rinominando gli stati
+    // niente ruolo fra i parametri: qui non e' una questione di permessi, e'
+    // l'operazione a non avere senso. Anche un ADMIN che rinomina BOZZA lascia
+    // il codice a cercare un nome che a database non esiste piu'
+    private void vietaSeDiSistema(String nome) {
+        boolean diSistema = STATI_DI_SISTEMA.stream().anyMatch(sistema -> sistema.equalsIgnoreCase(nome));
+        if (diSistema) {
+            throw new BadRequestException("Lo stato " + nome + " e' uno dei cinque stati previsti dal progetto"
+                    + " e non puo' essere rinominato o eliminato. Stati di sistema: " + STATI_DI_SISTEMA);
+        }
+    }
+
     private void vietaSeInsoluta(String nome, Utente currentUser) {
         if (INSOLUTA.equalsIgnoreCase(nome) && currentUser.getRuolo() != Ruolo.ADMIN) {
             throw new ForbiddenException("Solo un ADMIN puo' gestire lo stato " + INSOLUTA);
