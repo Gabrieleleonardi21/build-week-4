@@ -91,8 +91,10 @@ public class ClienteService {
         cliente.setFatturatoAnnuale(dto.fatturatoAnnuale());
         cliente.setTipo(dto.tipo());
         cliente.setLogoAziendale(dto.logoAziendale());
-        cliente.setSedeLegale(dto.sedeLegale());
-        cliente.setSedeOperativa(dto.sedeOperativa());
+        // risolti dal repository: assegnare l'oggetto ricevuto nel body darebbe
+        // a Hibernate un'entita' staccata dalla sessione
+        cliente.setSedeLegale(getIndirizzo(dto.sedeLegaleId()));
+        cliente.setSedeOperativa(getIndirizzo(dto.sedeOperativaId()));
 
         return clienteRepository.save(cliente);
     }
