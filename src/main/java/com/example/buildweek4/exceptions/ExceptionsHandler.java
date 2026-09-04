@@ -30,8 +30,11 @@ public class ExceptionsHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
     public ErrorsDTO handleValidationEx(MethodArgumentNotValidException ex) {
+        // il nome del campo va incluso: con piu' campi mancanti il solo
+        // getDefaultMessage() ripete lo stesso testo N volte ("non deve essere
+        // spazio, non deve essere spazio, ...") e chi chiama non sa cosa correggere
         String messaggi = ex.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
         return new ErrorsDTO(messaggi, LocalDateTime.now());
