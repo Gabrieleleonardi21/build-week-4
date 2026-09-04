@@ -4,6 +4,7 @@ import com.example.buildweek4.entities.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -13,4 +14,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID> {
     boolean existsByPartitaIva(String partitaIva);
 
     boolean existsByEmail(String email);
+
+    // clienti assegnati a un commerciale: usato per filtrare le note visibili
+    List<Cliente> findByCommercialeId(UUID commercialeId);
 }
