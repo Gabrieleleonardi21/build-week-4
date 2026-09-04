@@ -5,7 +5,8 @@ fatture con stati, utenti con ruoli. Spring Boot 4, PostgreSQL, autenticazione J
 
 Questo documento spiega **perché** il progetto è fatto così. Le scelte non ovvie sono
 commentate anche nel codice, qui c'è il quadro d'insieme.
-
+c'è un front-end di testing il link della repo è;
+https://github.com/Gabrieleleonardi21/front-end-build-week.git
 ---
 
 ## Avvio
