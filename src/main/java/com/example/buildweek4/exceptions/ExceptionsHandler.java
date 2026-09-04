@@ -4,6 +4,7 @@ import com.example.buildweek4.dto.ErrorsDTO;
 import com.example.buildweek4.entities.Utente;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
@@ -53,6 +54,18 @@ public class ExceptionsHandler {
         // chiama capisce subito che deve autenticarsi con un altro utente
         return new ErrorsDTO("Non hai i permessi necessari per questa operazione. Ruolo attuale: "
                 + ruoloUtenteCorrente(), LocalDateTime.now());
+    }
+
+    // authenticationManager.authenticate() in AuthController lancia una
+    // AuthenticationException (es. BadCredentialsException) quando email o password
+    // non corrispondono. Senza questo handler risale fino all'ExceptionTranslationFilter,
+    // che risponde 403 col messaggio generico di default ("Forbidden") invece del nostro.
+    // Il messaggio resta volutamente generico: non diciamo se a sbagliare e' stata
+    // l'email o la password, altrimenti si potrebbe scoprire quali email sono registrate
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN) // 403
+    public ErrorsDTO handleAuthenticationException() {
+        return new ErrorsDTO("Credenziali non valide", LocalDateTime.now());
     }
 
     // 403 lanciato a mano dai service (es. solo l'ADMIN puo' portare una fattura
