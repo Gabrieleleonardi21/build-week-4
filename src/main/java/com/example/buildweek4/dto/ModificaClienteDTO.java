@@ -21,6 +21,9 @@ public record ModificaClienteDTO(
         BigDecimal fatturatoAnnuale,
         @NotNull(message = "Il tipo societario è obbligatorio")
         TipoSocietario tipo,
+        // senza vincoli, come in NuovoClienteDTO: un cliente puo' non avere logo.
+        // Trattandosi di una PUT, se il campo non arriva nel body il logo esistente
+        // viene azzerato: per modificare solo alcuni campi si usa la PATCH
         String logoAziendale,
         @NotNull(message = "La sede legale è obbligatoria")
         UUID sedeLegaleId,

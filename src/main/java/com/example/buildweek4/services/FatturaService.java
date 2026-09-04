@@ -7,7 +7,6 @@ import com.example.buildweek4.entities.Fattura;
 import com.example.buildweek4.entities.Ruolo;
 import com.example.buildweek4.entities.StatoFattura;
 import com.example.buildweek4.entities.Utente;
-import com.example.buildweek4.exceptions.BadRequestException;
 import com.example.buildweek4.exceptions.ForbiddenException;
 import com.example.buildweek4.exceptions.NotFoundException;
 import com.example.buildweek4.repositories.ClienteRepository;
@@ -19,8 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -29,13 +26,6 @@ public class FatturaService {
     private final FatturaRepository fatturaRepository;
     private final ClienteRepository clienteRepository;
     private final StatoFatturaRepository statoFatturaRepository;
-
-    // transizioni ammesse: da uno stato si puo' passare solo a quelli elencati qui
-    private static final Map<String, Set<String>> TRANSIZIONI_VALIDE = Map.of(
-            "BOZZA", Set.of("EMESSA"),
-            "EMESSA", Set.of("PAGATA", "SCADUTA"),
-            "SCADUTA", Set.of("INSOLUTA")
-    );
 
     public Page<Fattura> getAll(Pageable pageable) {
         return fatturaRepository.findAll(pageable);
@@ -70,16 +60,14 @@ public class FatturaService {
 
     public Fattura cambiaStato(UUID fatturaId, String nuovoStatoNome, Utente currentUser) {
         Fattura fattura = this.getById(fatturaId);
-        String statoAttuale = fattura.getStato().getNome();
         // normalizzato prima di ogni controllo: gli stati sono salvati in maiuscolo
-        // (vedi DataSeeder/ClientiFattureSeeder), senza questo un client che manda
-        // "emessa" in minuscolo si vedrebbe rifiutare una transizione legittima
+        // (vedi DataSeeder), senza questo un client che manda "emessa" in minuscolo
+        // non troverebbe lo stato e si vedrebbe rifiutare una richiesta legittima
         String statoRichiesto = nuovoStatoNome.toUpperCase();
-        Set<String> statiAmmessi = TRANSIZIONI_VALIDE.getOrDefault(statoAttuale, Set.of());
-        if (!statiAmmessi.contains(statoRichiesto)) {
-            throw new BadRequestException("Transizione non valida da " + statoAttuale + " a " + statoRichiesto
-                    + ". Consentite da " + statoAttuale + ": " + statiAmmessi);
-        }
+        // nessun percorso obbligato fra gli stati: da qualsiasi stato si puo'
+        // passare a qualsiasi altro, l'unico limite e' l'autorizzazione.
+        // A filtrare i nomi ammessi basta la ricerca qui sotto, che trova solo
+        // gli stati esistenti a database
         // il controllo sta qui e non in un @PreAuthorize perche' dipende dal contenuto
         // del body: l'endpoint resta aperto ai contabili, e' solo questo stato a essere riservato
         if (StatoFatturaService.INSOLUTA.equals(statoRichiesto) && currentUser.getRuolo() != Ruolo.ADMIN) {
