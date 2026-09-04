@@ -8,6 +8,7 @@ import com.example.buildweek4.repositories.ClienteRepository;
 import com.example.buildweek4.repositories.FatturaRepository;
 import com.example.buildweek4.repositories.StatoFatturaRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -19,7 +20,9 @@ import java.util.List;
 // dati su cui lavorare senza crearli a mano da Postman. A differenza di
 // DemoDataRunner resta a database: nessuna pulizia alla chiusura dell'app.
 // Nessun @Profile: parte sempre, senza dover configurare nulla.
+// @Order(2): gli stati fattura li crea DataSeeder, che deve girare prima.
 @Component
+@Order(2)
 public class ClientiFattureSeeder implements CommandLineRunner {
 
     private static final int NUMERO_CLIENTI = 5;

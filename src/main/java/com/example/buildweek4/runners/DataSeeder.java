@@ -1,19 +1,35 @@
 package com.example.buildweek4.runners;
 
 import com.example.buildweek4.entities.Ruolo;
+import com.example.buildweek4.entities.StatoFattura;
 import com.example.buildweek4.entities.Utente;
+import com.example.buildweek4.repositories.StatoFatturaRepository;
 import com.example.buildweek4.repositories.UtenteRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-// Crea gli utenti iniziali al primo avvio: senza un ADMIN a database nessuno
-// potrebbe promuovere nessuno, perche' la registrazione assegna sempre USER.
+import java.util.List;
+
+// Dati di sistema, senza i quali l'applicazione non e' utilizzabile:
+// - gli utenti iniziali, perche' la registrazione assegna sempre USER e senza
+//   un ADMIN a database nessuno potrebbe promuovere nessuno
+// - gli stati fattura, perche' le transizioni cercano lo stato di destinazione
+//   a database: senza, ogni cambio di stato fallirebbe con un 404
+// @Order(1): deve girare prima di ClientiFattureSeeder, che sulle fatture demo
+// si aspetta di trovare lo stato BOZZA gia' presente.
 @Component
+@Order(1)
 public class DataSeeder implements CommandLineRunner {
 
+    // devono coincidere con i nomi usati in FatturaService.TRANSIZIONI_VALIDE
+    private static final List<String> STATI_FATTURA =
+            List.of("BOZZA", "EMESSA", "PAGATA", "SCADUTA", "INSOLUTA");
+
     private final UtenteRepository utenteRepository;
+    private final StatoFatturaRepository statoFatturaRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${seed.admin.email}")
@@ -29,16 +45,31 @@ public class DataSeeder implements CommandLineRunner {
     @Value("${seed.user.password}")
     private String userPassword;
 
-    public DataSeeder(UtenteRepository utenteRepository, PasswordEncoder passwordEncoder) {
+    public DataSeeder(UtenteRepository utenteRepository, StatoFatturaRepository statoFatturaRepository,
+                      PasswordEncoder passwordEncoder) {
         this.utenteRepository = utenteRepository;
+        this.statoFatturaRepository = statoFatturaRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
+        creaStatiMancanti();
         creaSeMancante(adminEmail, adminPassword, "Admin", "Iniziale", Ruolo.ADMIN);
         creaSeMancante(commercialeEmail, commercialePassword, "Commerciale", "Iniziale", Ruolo.COMMERCIALE);
         creaSeMancante(userEmail, userPassword, "User", "Iniziale", Ruolo.USER);
+    }
+
+    // controllo per singolo nome e non sulla tabella intera: se qualcuno ne ha
+    // cancellato uno a mano, al riavvio viene ricreato solo quello mancante
+    private void creaStatiMancanti() {
+        List<String> creati = STATI_FATTURA.stream()
+                .filter(nome -> !statoFatturaRepository.existsByNome(nome))
+                .map(nome -> statoFatturaRepository.save(new StatoFattura(nome)).getNome())
+                .toList();
+        if (!creati.isEmpty()) {
+            System.out.println("DataSeeder: creati stati fattura " + creati);
+        }
     }
 
     // idempotente: a ogni riavvio ricontrolla e non duplica nulla.
