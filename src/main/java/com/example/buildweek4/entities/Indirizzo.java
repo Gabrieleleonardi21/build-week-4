@@ -1,5 +1,6 @@
 package com.example.buildweek4.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,12 +40,17 @@ public class Indirizzo {
 
     // lato inverso delle relazioni: le colonne sede_legale_id e sede_operativa_id
     // vivono sulla tabella clienti, mappate dai campi sedeLegale e sedeOperativa di Cliente.
-    // @ToString.Exclude evita di caricare l'intera lista quando si stampa l'indirizzo
+    // @ToString.Exclude evita di caricare l'intera lista quando si stampa l'indirizzo.
+    // @JsonIgnore le tiene fuori dal JSON: senza, una GET su un cliente serializza
+    // cliente -> sede -> lista clienti -> sede ... all'infinito. Le relazioni restano
+    // comunque usabili lato Java, sparisce solo il campo dalla risposta HTTP
     @OneToMany(mappedBy = "sedeLegale")
     @ToString.Exclude
+    @JsonIgnore
     private List<Cliente> clientiSedeLegale;
     @OneToMany(mappedBy = "sedeOperativa")
     @ToString.Exclude
+    @JsonIgnore
     private List<Cliente> clientiSedeOperativa;
 
     public Indirizzo(String via, String civico, String citta, String provincia, String cap) {

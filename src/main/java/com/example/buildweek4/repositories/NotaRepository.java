@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-public interface NoteRepository extends JpaRepository<Nota, UUID> {
+public interface NotaRepository extends JpaRepository<Nota, UUID> {
 
     // Per il vincolo di cancellazione del Cliente
     boolean existsByClienteId(UUID clienteId);

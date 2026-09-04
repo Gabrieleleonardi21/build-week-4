@@ -56,6 +56,11 @@ public class Utente implements UserDetails {
         this.dataModifica = LocalDateTime.now();
     }
 
+    @PreUpdate
+    private void onModifica() {
+        this.dataModifica = LocalDateTime.now();
+    }
+
     public Utente() {}
 
     public Utente(String email, String password, String nome, String cognome, Ruolo ruolo) {
