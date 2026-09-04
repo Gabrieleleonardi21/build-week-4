@@ -1,9 +1,9 @@
 package com.example.buildweek4.controllers;
 
+import com.example.buildweek4.dto.FatturaResponseDTO;
 import com.example.buildweek4.dto.NewFatturaDTO;
 import com.example.buildweek4.dto.TransizioneStatoDTO;
 import com.example.buildweek4.dto.UpdateFatturaDTO;
-import com.example.buildweek4.entities.Fattura;
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.services.FatturaService;
 import org.springframework.validation.annotation.Validated;
@@ -26,37 +26,37 @@ public class FatturaController {
     // unico endpoint di elenco: i filtri sono opzionali, quindi senza parametri
     // restituisce tutte le fatture paginate, con parametri le filtra
     @GetMapping
-    public Page<Fattura> getFatture(@RequestParam(required = false) UUID clienteId,
+    public Page<FatturaResponseDTO> getFatture(@RequestParam(required = false) UUID clienteId,
                                     @RequestParam(required = false) UUID statoId,
                                     Pageable pageable) {
-        return fatturaService.filtra(clienteId, statoId, pageable);
+        return fatturaService.filtra(clienteId, statoId, pageable).map(FatturaResponseDTO::from);
     }
 
     @GetMapping("/{id}")
-    public Fattura getById(@PathVariable UUID id) {
-        return fatturaService.getById(id);
+    public FatturaResponseDTO getById(@PathVariable UUID id) {
+        return FatturaResponseDTO.from(fatturaService.getById(id));
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
-    public Fattura create(@RequestBody @Validated NewFatturaDTO body) {
-        return fatturaService.save(body);
+    public FatturaResponseDTO create(@RequestBody @Validated NewFatturaDTO body) {
+        return FatturaResponseDTO.from(fatturaService.save(body));
     }
 
     // il passaggio a INSOLUTA e' riservato all'ADMIN: il controllo e' nel service
     // perche' dipende dallo stato richiesto nel body
     @PatchMapping("/{id}/stato")
     @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
-    public Fattura cambiaStato(@PathVariable UUID id, @RequestBody @Validated TransizioneStatoDTO body,
+    public FatturaResponseDTO cambiaStato(@PathVariable UUID id, @RequestBody @Validated TransizioneStatoDTO body,
                                @AuthenticationPrincipal Utente currentUser) {
-        return fatturaService.cambiaStato(id, body.nuovoStato(), currentUser);
+        return FatturaResponseDTO.from(fatturaService.cambiaStato(id, body.nuovoStato(), currentUser));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('CONTABILE', 'ADMIN')")
-    public Fattura update(@PathVariable UUID id, @RequestBody @Validated UpdateFatturaDTO body) {
-        return fatturaService.update(id, body);
+    public FatturaResponseDTO update(@PathVariable UUID id, @RequestBody @Validated UpdateFatturaDTO body) {
+        return FatturaResponseDTO.from(fatturaService.update(id, body));
     }
 
     // la cancellazione è l'unica operazione sulle fatture riservata al solo ADMIN

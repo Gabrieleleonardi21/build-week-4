@@ -21,7 +21,6 @@ public record ModificaClienteDTO(
         BigDecimal fatturatoAnnuale,
         @NotNull(message = "Il tipo societario è obbligatorio")
         TipoSocietario tipo,
-        @NotBlank(message = "Il logo aziendale è obbligatorio")
         String logoAziendale,
         @NotNull(message = "La sede legale è obbligatoria")
         UUID sedeLegaleId,
