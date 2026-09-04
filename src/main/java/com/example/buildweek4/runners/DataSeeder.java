@@ -5,6 +5,7 @@ import com.example.buildweek4.entities.StatoFattura;
 import com.example.buildweek4.entities.Utente;
 import com.example.buildweek4.repositories.StatoFatturaRepository;
 import com.example.buildweek4.repositories.UtenteRepository;
+import com.example.buildweek4.services.StatoFatturaService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -24,9 +25,10 @@ import java.util.List;
 @Order(1)
 public class DataSeeder implements CommandLineRunner {
 
-    // devono coincidere con i nomi usati in FatturaService.TRANSIZIONI_VALIDE
-    private static final List<String> STATI_FATTURA =
-            List.of("BOZZA", "EMESSA", "PAGATA", "SCADUTA", "INSOLUTA");
+    // la lista sta in StatoFatturaService e non qui: e' la stessa che protegge
+    // quei nomi da rinomina e cancellazione, tenerne una copia significherebbe
+    // poterle far sfasare
+    private static final List<String> STATI_FATTURA = StatoFatturaService.STATI_DI_SISTEMA;
 
     private final UtenteRepository utenteRepository;
     private final StatoFatturaRepository statoFatturaRepository;
