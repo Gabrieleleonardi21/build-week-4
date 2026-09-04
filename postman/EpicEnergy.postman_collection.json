@@ -34,8 +34,8 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.test('Restituisce il token', () => pm.expect(pm.response.json().accessToken).to.be.a('string'));",
-									"pm.collectionVariables.set('adminToken', pm.response.json().accessToken);"
+									"pm.test('Restituisce il token', () => pm.expect(pm.response.json().token).to.be.a('string'));",
+									"pm.collectionVariables.set('adminToken', pm.response.json().token);"
 								]
 							}
 						}
@@ -84,9 +84,9 @@
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/register",
+							"raw": "{{baseUrl}}/utenti",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "auth", "register" ]
+							"path": [ "utenti" ]
 						}
 					},
 					"response": []
@@ -115,9 +115,9 @@
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/register",
+							"raw": "{{baseUrl}}/utenti",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "auth", "register" ]
+							"path": [ "utenti" ]
 						}
 					},
 					"response": []
@@ -146,9 +146,9 @@
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/register",
+							"raw": "{{baseUrl}}/utenti",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "auth", "register" ]
+							"path": [ "utenti" ]
 						},
 						"description": "Resta USER per tutta la collection: serve a verificare i permessi minimi."
 					},
@@ -240,9 +240,9 @@
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/register",
+							"raw": "{{baseUrl}}/utenti",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "auth", "register" ]
+							"path": [ "utenti" ]
 						},
 						"description": "Serve a verificare che un COMMERCIALE non veda i dati riservati dei clienti di cui non e' referente."
 					},
@@ -288,7 +288,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.collectionVariables.set('commercialeToken', pm.response.json().accessToken);"
+									"pm.collectionVariables.set('commercialeToken', pm.response.json().token);"
 								]
 							}
 						}
@@ -320,7 +320,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.collectionVariables.set('commerciale2Token', pm.response.json().accessToken);"
+									"pm.collectionVariables.set('commerciale2Token', pm.response.json().token);"
 								]
 							}
 						}
@@ -351,7 +351,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.collectionVariables.set('contabileToken', pm.response.json().accessToken);"
+									"pm.collectionVariables.set('contabileToken', pm.response.json().token);"
 								]
 							}
 						}
@@ -382,7 +382,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.collectionVariables.set('userToken', pm.response.json().accessToken);"
+									"pm.collectionVariables.set('userToken', pm.response.json().token);"
 								]
 							}
 						}
@@ -621,7 +621,7 @@
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
 									"pm.test('Via aggiornata', () => pm.expect(pm.response.json().via).to.eql('Via Torino Nuova'));",
-									"pm.test('dataUltimaModifica valorizzata', () => pm.expect(pm.response.json().dataUltimaModifica).to.not.eql(null));"
+									"pm.test('dataModifica valorizzata', () => pm.expect(pm.response.json().dataModifica).to.not.eql(null));"
 								]
 							}
 						}
@@ -641,6 +641,41 @@
 							"path": [ "indirizzi", "{{sedeLegaleId}}" ]
 						},
 						"description": "L'indirizzo si modifica dal suo endpoint, non dal PUT del cliente."
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH /indirizzi/{id} (COMMERCIALE)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('200 OK', () => pm.response.to.have.status(200));",
+									"pm.test('Solo il civico e\\' cambiato', () => {",
+									"    pm.expect(pm.response.json().civico).to.eql('12/C');",
+									"    pm.expect(pm.response.json().via).to.eql('Via Torino Nuova');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{commercialeToken}}", "type": "string" } ] },
+						"method": "PATCH",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"civico\": \"12/C\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/indirizzi/{{sedeLegaleId}}",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "indirizzi", "{{sedeLegaleId}}" ]
+						},
+						"description": "Solo i campi presenti nel body vengono aggiornati, gli altri restano invariati."
 					},
 					"response": []
 				},
@@ -691,7 +726,7 @@
 									"pm.test('201 Created', () => pm.response.to.have.status(201));",
 									"const body = pm.response.json();",
 									"pm.test('Il COMMERCIALE che crea diventa referente', () => {",
-									"    pm.expect(body.commercialeEmail).to.eql(pm.collectionVariables.get('emailCommerciale'));",
+									"    pm.expect(body.commerciale.email).to.eql(pm.collectionVariables.get('emailCommerciale'));",
 									"});",
 									"pm.test('Le sedi sono collegate per id', () => {",
 									"    pm.expect(body.sedeLegale.id).to.eql(pm.collectionVariables.get('sedeLegaleId'));",
@@ -790,7 +825,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.test('E\\' una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+									"pm.test('E\\' una pagina di risultati', () => pm.expect(pm.response.json().content).to.be.an('array'));"
 								]
 							}
 						}
@@ -808,7 +843,7 @@
 					"response": []
 				},
 				{
-					"name": "GET /clienti — filtri fatturatoMinimo + nome",
+					"name": "GET /clienti — paginazione",
 					"event": [
 						{
 							"listen": "test",
@@ -816,12 +851,9 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.test('Il cliente creato rientra nel filtro', () => {",
-									"    const ids = pm.response.json().map(c => c.id);",
+									"pm.test('Il cliente creato e\\' nella pagina', () => {",
+									"    const ids = pm.response.json().content.map(c => c.id);",
 									"    pm.expect(ids).to.include(pm.collectionVariables.get('clienteId'));",
-									"});",
-									"pm.test('Tutti sopra la soglia di fatturato', () => {",
-									"    pm.response.json().forEach(c => pm.expect(Number(c.fatturatoAnnuale)).to.be.at.least(100000));",
 									"});"
 								]
 							}
@@ -832,15 +864,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/clienti?fatturatoMinimo=100000&nome=energia",
+							"raw": "{{baseUrl}}/clienti?page=0&size=20",
 							"host": [ "{{baseUrl}}" ],
 							"path": [ "clienti" ],
 							"query": [
-								{ "key": "fatturatoMinimo", "value": "100000" },
-								{ "key": "nome", "value": "energia" }
+								{ "key": "page", "value": "0" },
+								{ "key": "size", "value": "20" }
 							]
 						},
-						"description": "Entrambi i parametri sono opzionali e combinabili: provare a togliere l'uno o l'altro."
+						"description": "ClienteController.getAll accetta solo Pageable (page/size/sort), non ci sono filtri fatturatoMinimo/nome nel controller reale."
 					},
 					"response": []
 				},
@@ -940,6 +972,72 @@
 					"response": []
 				},
 				{
+					"name": "PATCH /clienti/{id} (COMMERCIALE referente)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('200 OK', () => pm.response.to.have.status(200));",
+									"const body = pm.response.json();",
+									"pm.test('Solo la ragione sociale e\\' cambiata', () => {",
+									"    pm.expect(body.ragioneSociale).to.eql('Energia Verde Srl — Filiale Nord');",
+									"    pm.expect(body.partitaIva).to.eql(pm.collectionVariables.get('runId') + '00000');",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{commercialeToken}}", "type": "string" } ] },
+						"method": "PATCH",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ragioneSociale\": \"Energia Verde Srl — Filiale Nord\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clienti/{{clienteId}}",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "clienti", "{{clienteId}}" ]
+						},
+						"description": "Update parziale: solo i campi presenti nel body vengono modificati, gli altri restano invariati."
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH /clienti/{id} — USER → 403",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{userToken}}", "type": "string" } ] },
+						"method": "PATCH",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ragioneSociale\": \"Modifica Non Autorizzata\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clienti/{{clienteId}}",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "clienti", "{{clienteId}}" ]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "PATCH /clienti/{id}/tipo (ADMIN)",
 					"event": [
 						{
@@ -1010,7 +1108,7 @@
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
 									"pm.test('Referente confermato', () => {",
-									"    pm.expect(pm.response.json().commercialeEmail).to.eql(pm.collectionVariables.get('emailCommerciale'));",
+									"    pm.expect(pm.response.json().commerciale.email).to.eql(pm.collectionVariables.get('emailCommerciale'));",
 									"});"
 								]
 							}
@@ -1093,8 +1191,8 @@
 			]
 		},
 		{
-			"name": "03 — Note e filtro in lettura",
-			"description": "Le note sono strumento del reparto commerciale: il CONTABILE non le vede mai, ne' dall'endpoint dedicato ne' dentro il dettaglio cliente.",
+			"name": "03 — Note",
+			"description": "Le note sono strumento del reparto commerciale: solo COMMERCIALE e ADMIN vi accedono (@PreAuthorize), e un COMMERCIALE vede/modifica solo le note dei clienti a lui assegnati (controllo nel service).",
 			"item": [
 				{
 					"name": "POST /note (COMMERCIALE referente)",
@@ -1131,7 +1229,7 @@
 					"response": []
 				},
 				{
-					"name": "GET /note/cliente/{clienteId} (COMMERCIALE referente)",
+					"name": "GET /note?clienteId= (COMMERCIALE referente)",
 					"event": [
 						{
 							"listen": "test",
@@ -1149,15 +1247,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/note/cliente/{{clienteId}}",
+							"raw": "{{baseUrl}}/note?clienteId={{clienteId}}",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "note", "cliente", "{{clienteId}}" ]
+							"path": [ "note" ],
+							"query": [ { "key": "clienteId", "value": "{{clienteId}}" } ]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "GET /note/cliente/{clienteId} — CONTABILE → 403",
+					"name": "GET /note?clienteId= — CONTABILE → 403",
 					"event": [
 						{
 							"listen": "test",
@@ -1174,15 +1273,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/note/cliente/{{clienteId}}",
+							"raw": "{{baseUrl}}/note?clienteId={{clienteId}}",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "note", "cliente", "{{clienteId}}" ]
+							"path": [ "note" ],
+							"query": [ { "key": "clienteId", "value": "{{clienteId}}" } ]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "GET /note/cliente/{clienteId} — USER → 403",
+					"name": "GET /note?clienteId= — USER → 403",
 					"event": [
 						{
 							"listen": "test",
@@ -1199,44 +1299,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/note/cliente/{{clienteId}}",
+							"raw": "{{baseUrl}}/note?clienteId={{clienteId}}",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "note", "cliente", "{{clienteId}}" ]
+							"path": [ "note" ],
+							"query": [ { "key": "clienteId", "value": "{{clienteId}}" } ]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "GET /clienti/{id} — ADMIN vede le note",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.test('Il campo note e\\' popolato', () => {",
-									"    pm.expect(pm.response.json().note).to.be.an('array');",
-									"    pm.expect(pm.response.json().note.length).to.be.at.least(1);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{adminToken}}", "type": "string" } ] },
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/clienti/{{clienteId}}",
-							"host": [ "{{baseUrl}}" ],
-							"path": [ "clienti", "{{clienteId}}" ]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET /note/cliente/{clienteId} — COMMERCIALE non referente → 403",
+					"name": "GET /note?clienteId= — COMMERCIALE non referente → 403",
 					"event": [
 						{
 							"listen": "test",
@@ -1244,7 +1316,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('403 Forbidden', () => pm.response.to.have.status(403));",
-									"pm.test('Messaggio sul referente', () => pm.expect(pm.response.json().message).to.include('referente'));"
+									"pm.test('Messaggio sui clienti assegnati', () => pm.expect(pm.response.json().message).to.include('clienti'));"
 								]
 							}
 						}
@@ -1254,45 +1326,17 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/note/cliente/{{clienteId}}",
+							"raw": "{{baseUrl}}/note?clienteId={{clienteId}}",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "note", "cliente", "{{clienteId}}" ]
+							"path": [ "note" ],
+							"query": [ { "key": "clienteId", "value": "{{clienteId}}" } ]
 						},
-						"description": "Il ruolo giusto non basta: conta anche essere il referente del cliente."
+						"description": "Il ruolo giusto non basta: conta anche essere il commerciale assegnato al cliente."
 					},
 					"response": []
 				},
 				{
-					"name": "GET /clienti/{id} — COMMERCIALE non referente non vede le note",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test('200 OK: il cliente lo legge', () => pm.response.to.have.status(200));",
-									"pm.test('Ma le note restano nascoste: stessa regola di /note/cliente/{id}', () => {",
-									"    pm.expect(pm.response.json().note).to.eql(null);",
-									"});"
-								]
-							}
-						}
-					],
-					"request": {
-						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{commerciale2Token}}", "type": "string" } ] },
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/clienti/{{clienteId}}",
-							"host": [ "{{baseUrl}}" ],
-							"path": [ "clienti", "{{clienteId}}" ]
-						},
-						"description": "Senza questo controllo il dettaglio cliente sarebbe una strada laterale per leggere le note dei clienti altrui."
-					},
-					"response": []
-				},
-				{
-					"name": "GET /clienti — la lista non espone le note dei clienti altrui",
+					"name": "GET /note/{notaId} (COMMERCIALE referente)",
 					"event": [
 						{
 							"listen": "test",
@@ -1300,9 +1344,32 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.test('Nessuna nota visibile nella lista', () => {",
-									"    pm.response.json().forEach(c => pm.expect(c.note).to.eql(null));",
-									"});"
+									"pm.test('E\\' la nota creata', () => pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get('notaId')));"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{commercialeToken}}", "type": "string" } ] },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/note/{{notaId}}",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "note", "{{notaId}}" ]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /note/{notaId} — COMMERCIALE non referente → 403",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
 								]
 							}
 						}
@@ -1312,40 +1379,71 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/clienti",
+							"raw": "{{baseUrl}}/note/{{notaId}}",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "clienti" ]
-						},
-						"description": "Il secondo commerciale non e' referente di nessun cliente, quindi la lista non gli mostra nessuna nota."
+							"path": [ "note", "{{notaId}}" ]
+						}
 					},
 					"response": []
 				},
 				{
-					"name": "GET /clienti/{id} — CONTABILE non vede le note",
+					"name": "PATCH /note/{notaId} (COMMERCIALE referente)",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"pm.test('200 OK: il cliente lo legge', () => pm.response.to.have.status(200));",
-									"pm.test('Ma il campo note resta null (terzo meccanismo di autorizzazione)', () => {",
-									"    pm.expect(pm.response.json().note).to.eql(null);",
-									"});"
+									"pm.test('200 OK', () => pm.response.to.have.status(200));",
+									"pm.test('Contenuto aggiornato', () => pm.expect(pm.response.json().contenuto).to.eql('Cliente confermato: passa a tariffa business.'));"
 								]
 							}
 						}
 					],
 					"request": {
-						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{contabileToken}}", "type": "string" } ] },
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/clienti/{{clienteId}}",
-							"host": [ "{{baseUrl}}" ],
-							"path": [ "clienti", "{{clienteId}}" ]
+						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{commercialeToken}}", "type": "string" } ] },
+						"method": "PATCH",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contenuto\": \"Cliente confermato: passa a tariffa business.\"\n}",
+							"options": { "raw": { "language": "json" } }
 						},
-						"description": "Il filtro in lettura: stesso endpoint, stessa entita', contenuto diverso in base al ruolo."
+						"url": {
+							"raw": "{{baseUrl}}/note/{{notaId}}",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "note", "{{notaId}}" ]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH /note/{notaId} — COMMERCIALE non referente → 403",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{commerciale2Token}}", "type": "string" } ] },
+						"method": "PATCH",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contenuto\": \"Modifica non autorizzata\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/note/{{notaId}}",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "note", "{{notaId}}" ]
+						}
 					},
 					"response": []
 				}
@@ -1356,7 +1454,7 @@
 			"description": "StatoFattura e' un'entita' e non un enum: il CONTABILE puo' aggiungere stati a runtime.",
 			"item": [
 				{
-					"name": "GET /stati-fattura",
+					"name": "GET /stato_fatture",
 					"event": [
 						{
 							"listen": "test",
@@ -1381,15 +1479,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/stati-fattura",
+							"raw": "{{baseUrl}}/stato_fatture",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "stati-fattura" ]
+							"path": [ "stato_fatture" ]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "POST /stati-fattura (CONTABILE)",
+					"name": "POST /stato_fatture (CONTABILE)",
 					"event": [
 						{
 							"listen": "test",
@@ -1413,16 +1511,16 @@
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{baseUrl}}/stati-fattura",
+							"raw": "{{baseUrl}}/stato_fatture",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "stati-fattura" ]
+							"path": [ "stato_fatture" ]
 						},
 						"description": "Nuovo stato aggiunto a runtime, senza toccare il codice."
 					},
 					"response": []
 				},
 				{
-					"name": "POST /stati-fattura — nome gia' esistente → 400",
+					"name": "POST /stato_fatture — nome gia' esistente → 400",
 					"event": [
 						{
 							"listen": "test",
@@ -1445,15 +1543,15 @@
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{baseUrl}}/stati-fattura",
+							"raw": "{{baseUrl}}/stato_fatture",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "stati-fattura" ]
+							"path": [ "stato_fatture" ]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "PUT /stati-fattura/{id} (CONTABILE)",
+					"name": "PUT /stato_fatture/{id} (CONTABILE)",
 					"event": [
 						{
 							"listen": "test",
@@ -1476,15 +1574,15 @@
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{baseUrl}}/stati-fattura/{{statoCustomId}}",
+							"raw": "{{baseUrl}}/stato_fatture/{{statoCustomId}}",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "stati-fattura", "{{statoCustomId}}" ]
+							"path": [ "stato_fatture", "{{statoCustomId}}" ]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "DELETE /stati-fattura/{id} — non in uso → 204",
+					"name": "DELETE /stato_fatture/{id} — non in uso → 204",
 					"event": [
 						{
 							"listen": "test",
@@ -1501,16 +1599,16 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/stati-fattura/{{statoCustomId}}",
+							"raw": "{{baseUrl}}/stato_fatture/{{statoCustomId}}",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "stati-fattura", "{{statoCustomId}}" ]
+							"path": [ "stato_fatture", "{{statoCustomId}}" ]
 						},
 						"description": "Nessuna fattura lo usa, quindi si elimina."
 					},
 					"response": []
 				},
 				{
-					"name": "POST /stati-fattura — COMMERCIALE → 403",
+					"name": "POST /stato_fatture — COMMERCIALE → 403",
 					"event": [
 						{
 							"listen": "test",
@@ -1532,9 +1630,9 @@
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{baseUrl}}/stati-fattura",
+							"raw": "{{baseUrl}}/stato_fatture",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "stati-fattura" ]
+							"path": [ "stato_fatture" ]
 						}
 					},
 					"response": []
@@ -1635,7 +1733,7 @@
 					"response": []
 				},
 				{
-					"name": "GET /fatture — filtri clienteId + stato",
+					"name": "GET /fatture — filtri clienteId + statoId",
 					"event": [
 						{
 							"listen": "test",
@@ -1644,7 +1742,7 @@
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
 									"pm.test('La fattura creata rientra nel filtro', () => {",
-									"    const ids = pm.response.json().map(f => f.id);",
+									"    const ids = pm.response.json().content.map(f => f.id);",
 									"    pm.expect(ids).to.include(pm.collectionVariables.get('fatturaId'));",
 									"});"
 								]
@@ -1656,12 +1754,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/fatture?clienteId={{clienteId}}&stato=BOZZA",
+							"raw": "{{baseUrl}}/fatture?clienteId={{clienteId}}&statoId={{statoBozzaId}}",
 							"host": [ "{{baseUrl}}" ],
 							"path": [ "fatture" ],
 							"query": [
 								{ "key": "clienteId", "value": "{{clienteId}}" },
-								{ "key": "stato", "value": "BOZZA" }
+								{ "key": "statoId", "value": "{{statoBozzaId}}" }
 							]
 						}
 					},
@@ -1948,33 +2046,7 @@
 					"response": []
 				},
 				{
-					"name": "DELETE /indirizzi/{id} — in uso come sede → 409",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"pm.test('409 Conflict', () => pm.response.to.have.status(409));",
-									"pm.test('Messaggio esplicito', () => pm.expect(pm.response.json().message).to.include('sede'));"
-								]
-							}
-						}
-					],
-					"request": {
-						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{adminToken}}", "type": "string" } ] },
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/indirizzi/{{sedeLegaleId}}",
-							"host": [ "{{baseUrl}}" ],
-							"path": [ "indirizzi", "{{sedeLegaleId}}" ]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE /stati-fattura/{id} — stato in uso → 409",
+					"name": "DELETE /stato_fatture/{id} — stato in uso → 409",
 					"event": [
 						{
 							"listen": "test",
@@ -1992,9 +2064,9 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/stati-fattura/{{statoInsolutaId}}",
+							"raw": "{{baseUrl}}/stato_fatture/{{statoInsolutaId}}",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "stati-fattura", "{{statoInsolutaId}}" ]
+							"path": [ "stato_fatture", "{{statoInsolutaId}}" ]
 						},
 						"description": "INSOLUTA e' lo stato corrente della fattura creata nella cartella 05."
 					},
@@ -2137,7 +2209,7 @@
 					"response": []
 				},
 				{
-					"name": "POST /auth/register — email gia' registrata → 400",
+					"name": "POST /utenti — email gia' registrata → 400",
 					"event": [
 						{
 							"listen": "test",
@@ -2160,9 +2232,9 @@
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/register",
+							"raw": "{{baseUrl}}/utenti",
 							"host": [ "{{baseUrl}}" ],
-							"path": [ "auth", "register" ]
+							"path": [ "utenti" ]
 						}
 					},
 					"response": []
@@ -2205,7 +2277,32 @@
 			"description": "Rimuove quello che l'API permette di rimuovere. Il cliente e i due indirizzi restano a database: il cliente ha una nota collegata e l'API non espone un endpoint per eliminare le note, quindi il vincolo dei 409 non e' aggirabile dall'esterno.",
 			"item": [
 				{
-					"name": "DELETE /fatture/{id} (CONTABILE)",
+					"name": "DELETE /fatture/{id} — CONTABILE → 403",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"pm.test('403 Forbidden: solo ADMIN', () => pm.response.to.have.status(403));"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{contabileToken}}", "type": "string" } ] },
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/fatture/{{fatturaId}}",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "fatture", "{{fatturaId}}" ]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /fatture/{id} (ADMIN)",
 					"event": [
 						{
 							"listen": "test",
@@ -2218,7 +2315,7 @@
 						}
 					],
 					"request": {
-						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{contabileToken}}", "type": "string" } ] },
+						"auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{adminToken}}", "type": "string" } ] },
 						"method": "DELETE",
 						"header": [],
 						"url": {
@@ -2262,7 +2359,7 @@
 		}
 	],
 	"variable": [
-		{ "key": "baseUrl", "value": "http://localhost:8080" },
+		{ "key": "baseUrl", "value": "http://localhost:3001/api" },
 		{ "key": "adminEmail", "value": "admin@epicenergy.it" },
 		{ "key": "adminPassword", "value": "adminpassword" },
 		{ "key": "passwordDefault", "value": "Password123!" },

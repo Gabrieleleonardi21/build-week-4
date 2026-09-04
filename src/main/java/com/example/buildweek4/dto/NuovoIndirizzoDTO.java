@@ -2,7 +2,7 @@ package com.example.buildweek4.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record ModificaIndirizzoDTO(
+public record NuovoIndirizzoDTO(
         @NotBlank(message = "La via è obbligatoria")
         String via,
         @NotBlank(message = "Il civico è obbligatorio")
