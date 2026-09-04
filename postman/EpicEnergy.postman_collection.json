@@ -1653,7 +1653,7 @@
 								"exec": [
 									"pm.test('201 Created', () => pm.response.to.have.status(201));",
 									"pm.test('Nasce sempre in BOZZA, lo stato non arriva dal body', () => {",
-									"    pm.expect(pm.response.json().stato.nome).to.eql('BOZZA');",
+									"    pm.expect(pm.response.json().statoNome).to.eql('BOZZA');",
 									"});",
 									"pm.collectionVariables.set('fatturaId', pm.response.json().id);"
 								]
@@ -1800,7 +1800,7 @@
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
 									"pm.test('Importo aggiornato', () => pm.expect(Number(pm.response.json().importo)).to.eql(1800));",
-									"pm.test('Lo stato NON cambia con il PUT', () => pm.expect(pm.response.json().stato.nome).to.eql('BOZZA'));"
+									"pm.test('Lo stato NON cambia con il PUT', () => pm.expect(pm.response.json().statoNome).to.eql('BOZZA'));"
 								]
 							}
 						}
@@ -1831,7 +1831,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.test('Stato EMESSA', () => pm.expect(pm.response.json().stato.nome).to.eql('EMESSA'));"
+									"pm.test('Stato EMESSA', () => pm.expect(pm.response.json().statoNome).to.eql('EMESSA'));"
 								]
 							}
 						}
@@ -1896,7 +1896,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.test('Stato SCADUTA', () => pm.expect(pm.response.json().stato.nome).to.eql('SCADUTA'));"
+									"pm.test('Stato SCADUTA', () => pm.expect(pm.response.json().statoNome).to.eql('SCADUTA'));"
 								]
 							}
 						}
@@ -1960,7 +1960,7 @@
 								"type": "text/javascript",
 								"exec": [
 									"pm.test('200 OK', () => pm.response.to.have.status(200));",
-									"pm.test('Stato INSOLUTA', () => pm.expect(pm.response.json().stato.nome).to.eql('INSOLUTA'));"
+									"pm.test('Stato INSOLUTA', () => pm.expect(pm.response.json().statoNome).to.eql('INSOLUTA'));"
 								]
 							}
 						}

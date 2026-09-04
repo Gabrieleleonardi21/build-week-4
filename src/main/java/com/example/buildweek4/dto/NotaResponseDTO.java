@@ -13,6 +13,8 @@ public record NotaResponseDTO(
         LocalDateTime dataCreazione,
         LocalDateTime dataModifica
 ) {
+    // factory statico: tiene la conversione Nota -> DTO in un unico punto,
+    // cosi' il controller non la ripete uguale in ognuno dei suoi 4 endpoint
     public static NotaResponseDTO from(Nota nota) {
         return new NotaResponseDTO(
                 nota.getId(),
