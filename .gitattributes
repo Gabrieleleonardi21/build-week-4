@@ -1,0 +1,8 @@
+# Line-ending uniformi per tutti: LF nel repository e nel working tree.
+# Evita diff che segnalano interi file modificati quando si lavora su OS diversi.
+* text=auto eol=lf
+
+# Eccezioni: script che devono mantenere il formato richiesto dal loro interprete.
+# Vanno dopo la regola generica, perche' l'ultima regola che corrisponde ha la precedenza.
+/mvnw text eol=lf
+*.cmd text eol=crlf
