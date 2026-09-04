@@ -1204,7 +1204,7 @@
 								"exec": [
 									"pm.test('201 Created', () => pm.response.to.have.status(201));",
 									"pm.test('L\\'autore e\\' l\\'utente autenticato, non un campo del body', () => {",
-									"    pm.expect(pm.response.json().autore.email).to.eql(pm.collectionVariables.get('emailCommerciale'));",
+									"    pm.expect(pm.response.json().autoreEmail).to.eql(pm.collectionVariables.get('emailCommerciale'));",
 									"});",
 									"pm.collectionVariables.set('notaId', pm.response.json().id);"
 								]
