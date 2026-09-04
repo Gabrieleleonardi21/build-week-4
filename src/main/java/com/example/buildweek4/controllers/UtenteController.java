@@ -7,6 +7,7 @@ import com.example.buildweek4.services.UtenteService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,14 @@ public class UtenteController {
     @ResponseStatus(HttpStatus.CREATED)
     public Utente register(@RequestBody @Validated RegisterRequestDTO dto) {
         return utenteService.register(dto);
+    }
+
+    // GET /utenti/me -> il proprio profilo: nessun @PreAuthorize, basta essere
+    // autenticati. L'Utente arriva dal SecurityContext, dove lo ha messo il
+    // JwtFilter partendo dall'id contenuto nel token (la password e' @JsonIgnore)
+    @GetMapping("/me")
+    public Utente getProfilo(@AuthenticationPrincipal Utente currentUser) {
+        return currentUser;
     }
 
     // GET /utenti -> solo ADMIN (gli serve per trovare gli id da promuovere)
